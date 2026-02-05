@@ -1,0 +1,16 @@
+{
+  "chainId": 63,
+  "network": "mordor",
+  "deployer": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537",
+  "contracts": {
+    "ECNSRegistry": "0xd8bb6e11d674ce8822a2bfff7f0510ab51e50ef8",
+    "ReverseRegistrar": "0x8527c6f200f772e50a80bf8baf1003e8ca60db0e"
+  },
+  "tld": {
+    "name": "etc",
+    "labelHash": "0x997997d543f68c7b77e62a13efc6e546bd2a81c2aa8769c3354422ebbbb4fba4",
+    "node": "0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9",
+    "owner": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537"
+  },
+  "blockExplorer": "https://etc.blockscout.com/mordor"
+}
