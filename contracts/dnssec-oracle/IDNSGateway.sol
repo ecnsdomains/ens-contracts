@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {DNSSEC} from "./DNSSEC.sol";
 
 /// @notice Interface for the offchain DNSSEC oracle gateway.
-///         https://docs.ens.domains/ensip/17#dnssec-gateway-api
+///         https://docs.ecns.domains/ensip/17#dnssec-gateway-api
 /// @dev Interface selector: `0x31b137b9`
 interface IDNSGateway {
     /// @dev Fetch verifiable DNSSEC resource records of a specific type for a name.

@@ -39,7 +39,7 @@ export default deployScript(
   {
     id: 'BaseRegistrarImplementation:setup v1.0.0',
     tags: [
-      'category:ethregistrar',
+      'category:etcregistrar',
       'BaseRegistrarImplementation',
       'BaseRegistrarImplementation:setup',
     ],

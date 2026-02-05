@@ -30,7 +30,7 @@ abstract contract ResolverCaller is CCIPBatcher {
     ///
     /// - If extended, the calldata is not `multicall()`, and the resolver supports ENSIP-22 features,
     ///   the call is performed directly without the batch gateway.
-    /// - If extended, the calldata is `multicall()`, and the resolver supports `eth.ens.resolver.extended.multicall` feature,
+    /// - If extended, the calldata is `multicall()`, and the resolver supports `eth.ecns.resolver.extended.multicall` feature,
     ///   the call is performed directly without the batch gateway.
     /// - Otherwise, the call is performed with the batch gateway.
     ///   The batch gateway is only invoked if any call reverts `OffchainLookup`.

@@ -32,7 +32,7 @@ export default deployScript(
   {
     id: 'RegistrarSecurityController v1.0.0',
     tags: [
-      'category:ethregistrar',
+      'category:etcregistrar',
       'RegistrarSecurityController',
       'RegistrarSecurityController:contract',
     ],

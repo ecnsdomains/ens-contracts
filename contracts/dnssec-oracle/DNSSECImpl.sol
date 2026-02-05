@@ -16,8 +16,8 @@ import "@ensdomains/buffer/contracts/Buffer.sol";
  *       - NSEC & NSEC3 are not supported; only positive proofs are allowed.
  *       - Proofs involving wildcard names will not validate.
  *       - TTLs on records are ignored, as data is not stored persistently.
- *       - Canonical form of names is not checked; in ENS this is done on the frontend, so submitting
- *         proofs with non-canonical names will only result in registering unresolvable ENS names.
+ *       - Canonical form of names is not checked; in ECNS this is done on the frontend, so submitting
+ *         proofs with non-canonical names will only result in registering unresolvable ECNS names.
  */
 contract DNSSECImpl is DNSSEC, Owned {
     using Buffer for Buffer.buffer;

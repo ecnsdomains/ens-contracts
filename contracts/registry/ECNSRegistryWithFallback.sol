@@ -1,14 +1,14 @@
 pragma solidity >=0.8.4;
 
-import "./ENS.sol";
-import "./ENSRegistry.sol";
+import "./ECNS.sol";
+import "./ECNSRegistry.sol";
 
-/// The ENS registry contract.
-contract ENSRegistryWithFallback is ENSRegistry {
-    ENS public old;
+/// The ECNS registry contract with fallback to old registry.
+contract ECNSRegistryWithFallback is ECNSRegistry {
+    ECNS public old;
 
-    /// @dev Constructs a new ENS registrar.
-    constructor(ENS _old) public ENSRegistry() {
+    /// @dev Constructs a new ECNS registrar with fallback.
+    constructor(ECNS _old) public ECNSRegistry() {
         old = _old;
     }
 

@@ -1,6 +1,10 @@
 import { artifacts, deployScript } from '@rocketh'
-import { namehash, zeroAddress } from 'viem'
-import { createInterfaceId } from '../../test/fixtures/createInterfaceId.js'
+import type { Artifact } from 'rocketh'
+import { namehash, zeroAddress, type Abi } from 'viem'
+import wrappedEthRegistrarArtifactRaw from '../../deployments/mainnet/WrappedETCRegistrarController.json'
+
+const wrappedEthRegistrarArtifact =
+  wrappedEthRegistrarArtifactRaw as unknown as Artifact<Abi>
 
 export default deployScript(
   async ({
@@ -10,7 +14,7 @@ export default deployScript(
     read,
     namedAccounts,
     network,
-    registerUnwrappedNames,
+    registerWrappedNames,
   }) => {
     const { deployer, owner } = namedAccounts
 
@@ -26,20 +30,19 @@ export default deployScript(
     >('ExponentialPremiumPriceOracle')
     const reverseRegistrar =
       get<(typeof artifacts.ReverseRegistrar)['abi']>('ReverseRegistrar')
-    const defaultReverseRegistrar = get<
-      (typeof artifacts.DefaultReverseRegistrar)['abi']
-    >('DefaultReverseRegistrar')
+    const nameWrapper =
+      get<(typeof artifacts.NameWrapper)['abi']>('NameWrapper')
 
-    const controller = await deploy('ETHRegistrarController', {
+    const controller = await deploy('WrappedETCRegistrarController', {
       account: deployer,
-      artifact: artifacts.ETHRegistrarController,
+      artifact: wrappedEthRegistrarArtifact,
       args: [
         registrar.address,
         priceOracle.address,
         60n,
         86400n,
         reverseRegistrar.address,
-        defaultReverseRegistrar.address,
+        nameWrapper.address,
         registry.address,
       ],
     })
@@ -49,7 +52,7 @@ export default deployScript(
     // Transfer ownership to owner
     if (owner !== deployer) {
       console.log(
-        `  - Transferring ownership of ETHRegistrarController to ${owner}`,
+        `  - Transferring ownership of WrappedETCRegistrarController to ${owner}`,
       )
       await write(controller, {
         functionName: 'transferOwnership',
@@ -61,9 +64,18 @@ export default deployScript(
     // Only attempt to make controller etc changes directly on testnets
     if (network.name === 'mainnet' && !network.tags?.tenderly) return
 
+    console.log(
+      '  - Adding WrappedETCRegistrarController as controller on NameWrapper',
+    )
+    await write(nameWrapper, {
+      functionName: 'setController',
+      args: [controller.address, true],
+      account: owner,
+    })
+
     // Add controller to BaseRegistrarImplementation
     console.log(
-      `  - Adding ETHRegistrarController via RegistrarSecurityController`,
+      `  - Adding WrappedETCRegistrarController via RegistrarSecurityController`,
     )
     await write(registrarSecurityController, {
       functionName: 'addRegistrarController',
@@ -73,7 +85,7 @@ export default deployScript(
 
     // Add controller to ReverseRegistrar
     console.log(
-      `  - Adding ETHRegistrarController as controller on ReverseRegistrar`,
+      `  - Adding WrappedETCRegistrarController as controller on ReverseRegistrar`,
     )
     await write(reverseRegistrar, {
       functionName: 'setController',
@@ -81,58 +93,46 @@ export default deployScript(
       account: owner,
     })
 
-    // Add controller to DefaultReverseRegistrar
-    console.log(
-      `  - Adding ETHRegistrarController as controller on DefaultReverseRegistrar`,
-    )
-    await write(defaultReverseRegistrar, {
-      functionName: 'setController',
-      args: [controller.address, true],
-      account: owner,
-    })
-
     // Set interface on resolver
-    const artifact = artifacts.IETHRegistrarController
-    const interfaceId = createInterfaceId(artifact.abi)
+    const interfaceId = '0x612e8c09'
 
     const resolver = await read(registry, {
       functionName: 'resolver',
-      args: [namehash('eth')],
+      args: [namehash('etc')],
     })
     if (resolver === zeroAddress) {
       console.warn(
-        `  - WARN: No resolver set for .eth; not setting interface ${interfaceId} for ETHRegistrarController`,
+        `  - WARN: No resolver set for .etc; not setting interface ${interfaceId} for WrappedETCRegistrarController`,
       )
       return
     }
 
     console.log(
-      `  - Setting ETHRegistrarController interface ID ${interfaceId} on .eth resolver`,
+      `  - Setting WrappedETCRegistrarController interface ID ${interfaceId} on .etc resolver`,
     )
     await write(
       { ...artifacts.OwnedResolver, address: resolver },
       {
         functionName: 'setInterface',
-        args: [namehash('eth'), interfaceId, controller.address],
+        args: [namehash('etc'), interfaceId, controller.address],
         account: owner,
       },
     )
 
-    if (registerUnwrappedNames) {
-      console.log('  - Running registerUnwrappedNames hook')
-      await registerUnwrappedNames()
+    if (registerWrappedNames) {
+      console.log('  - Running registerWrappedNames hook')
+      await registerWrappedNames()
     }
   },
   {
-    id: 'ETHRegistrarController v3.0.0',
-    tags: ['category:ethregistrar', 'ETHRegistrarController'],
+    id: 'ETCRegistrarController v2.0.0',
+    tags: ['category:etcregistrar', 'WrappedETCRegistrarController'],
     dependencies: [
       'ENSRegistry',
       'BaseRegistrarImplementation',
       'RegistrarSecurityController',
       'ExponentialPremiumPriceOracle',
       'ReverseRegistrar',
-      'DefaultReverseRegistrar',
       'NameWrapper',
       'OwnedResolver',
     ],

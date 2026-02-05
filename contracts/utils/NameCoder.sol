@@ -13,7 +13,7 @@ import {BytesUtils} from "./BytesUtils.sol";
 ///
 /// * maximum label length is 255 bytes.
 /// * length = 0 is reserved for the terminator (root).
-/// * `dns.length == 2 + ens.length` and the mapping is injective.
+/// * `dns.length == 2 + ecns.length` and the mapping is injective.
 ///
 library NameCoder {
     /// @dev The namehash of "eth".
@@ -360,13 +360,13 @@ library NameCoder {
     }
 
     /// @dev Transform `label` to DNS-encoded `{label}.eth`.
-    ///      * `ethName("eth") = "\x04test\x03eth\x00"`
+    ///      * `etcName("eth") = "\x04test\x03eth\x00"`
     ///      Behaves like `addLabel()`.
     ///
     /// @param label The label to encode.
     ///
     /// @return The DNS-encoded name.
-    function ethName(string memory label) internal pure returns (bytes memory) {
+    function etcName(string memory label) internal pure returns (bytes memory) {
         return addLabel("\x03eth\x00", label);
     }
 }

@@ -5,7 +5,7 @@ import {ResolverBase, IERC165} from "../ResolverBase.sol";
 import {IAddrResolver} from "./IAddrResolver.sol";
 import {IAddressResolver} from "./IAddressResolver.sol";
 import {IHasAddressResolver} from "./IHasAddressResolver.sol";
-import {ENSIP19, COIN_TYPE_ETH, COIN_TYPE_DEFAULT} from "../../utils/ENSIP19.sol";
+import {ECNSIP19, COIN_TYPE_ETH, COIN_TYPE_DEFAULT} from "../../utils/ECNSIP19.sol";
 
 abstract contract AddrResolver is
     IAddrResolver,
@@ -52,7 +52,7 @@ abstract contract AddrResolver is
         if (
             addressBytes.length != 0 &&
             addressBytes.length != 20 &&
-            ENSIP19.isEVMCoinType(coinType)
+            ECNSIP19.isEVMCoinType(coinType)
         ) {
             revert InvalidEVMAddress(addressBytes);
         }
@@ -79,7 +79,7 @@ abstract contract AddrResolver is
         ][node];
         addressBytes = addrs[coinType];
         if (
-            addressBytes.length == 0 && ENSIP19.chainFromCoinType(coinType) > 0
+            addressBytes.length == 0 && ECNSIP19.chainFromCoinType(coinType) > 0
         ) {
             addressBytes = addrs[COIN_TYPE_DEFAULT];
         }

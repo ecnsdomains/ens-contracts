@@ -13,8 +13,6 @@ const realAccounts = [
   configVariable('OWNER_KEY'),
 ]
 
-import { arbitrum, optimism } from 'viem/chains'
-
 dotenv.config({ debug: false })
 
 // circular dependency shared with actions
@@ -22,52 +20,32 @@ export const archivedDeploymentPath = './deployments/archive'
 
 const config = {
   networks: {
+    // Local development with Anvil
     hardhat: {
       type: 'edr-simulated',
       allowUnlimitedContractSize: false,
-    },
-    mainnetFork: {
-      type: 'edr-simulated',
-      allowUnlimitedContractSize: false,
-      chainId: 1,
-      forking: {
-        enabled: true,
-        url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      },
     },
     localhost: {
       type: 'http',
       chainId: 31337,
       url: 'http://127.0.0.1:8545/',
     },
-    sepolia: {
+    anvil: {
       type: 'http',
-      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 11155111,
+      chainId: 31337,
+      url: 'http://127.0.0.1:8545/',
+    },
+    // Ethereum Classic Networks
+    classic: {
+      type: 'http',
+      url: process.env.ETC_RPC_URL || 'https://etc.rivet.cloud',
+      chainId: 61,
       accounts: realAccounts,
     },
-    holesky: {
+    mordor: {
       type: 'http',
-      url: `https://holesky.gateway.tenderly.co`,
-      chainId: 17000,
-      accounts: realAccounts,
-    },
-    mainnet: {
-      type: 'http',
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 1,
-      accounts: realAccounts,
-    },
-    optimism: {
-      type: 'http',
-      url: optimism.rpcUrls.default.http[0],
-      chainId: optimism.id,
-      accounts: realAccounts,
-    },
-    arbitrum: {
-      type: 'http',
-      url: arbitrum.rpcUrls.default.http[0],
-      chainId: arbitrum.id,
+      url: process.env.MORDOR_RPC_URL || 'https://rpc.mordor.etccooperative.org',
+      chainId: 63,
       accounts: realAccounts,
     },
   },
@@ -168,10 +146,10 @@ const config = {
       })
       .setAction(() => import('./tasks/save.js'))
       .build(),
-    task('seed', 'Creates test subbdomains and wraps them with Namewrapper')
+    task('seed', 'Creates test subdomains and wraps them with Namewrapper')
       .addPositionalArgument({
         name: 'name',
-        description: 'The ENS label to seed subdomains',
+        description: 'The ECNS label to seed subdomains',
       })
       .setAction(() => import('./tasks/seed.js'))
       .build(),

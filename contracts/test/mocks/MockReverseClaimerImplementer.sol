@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.17 <0.9.0;
 
-import {ENS} from "../../../contracts/registry/ENS.sol";
+import {ECNS} from "../../../contracts/registry/ECNS.sol";
 import {ReverseClaimer} from "../../../contracts/reverseRegistrar/ReverseClaimer.sol";
 
 contract MockReverseClaimerImplementer is ReverseClaimer {
-    constructor(ENS ens, address claimant) ReverseClaimer(ens, claimant) {}
+    constructor(ECNS ecns, address claimant) ReverseClaimer(ecns, claimant) {}
 }

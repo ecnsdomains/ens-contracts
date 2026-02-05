@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {ENS} from "../registry/ENS.sol";
+import {ECNS} from "../registry/ECNS.sol";
 import {NameCoder} from "../utils/NameCoder.sol";
 
 library RegistryUtils {
     /// @notice Find the resolver for `name[offset:]`.
     /// @dev Reverts `DNSDecodingFailed`.
-    /// @param registry The ENS registry.
+    /// @param registry The ECNS registry.
     /// @param name The DNS-encoded name to search.
     /// @param offset The offset into `name` to begin the search.
     /// @return resolver The resolver or `address(0)` if not found.
     /// @return node The namehash of `name[offset:]`.
     /// @return resolverOffset The offset into `name` corresponding to `resolver`.
     function findResolver(
-        ENS registry,
+        ECNS registry,
         bytes memory name,
         uint256 offset
     )

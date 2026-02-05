@@ -10,7 +10,7 @@ import {IAddrResolver} from "../resolvers/profiles/IAddrResolver.sol";
 import {INameResolver} from "../resolvers/profiles/INameResolver.sol";
 import {INameReverser} from "./INameReverser.sol";
 import {IERC7996} from "../utils/IERC7996.sol";
-import {ENSIP19, COIN_TYPE_DEFAULT, COIN_TYPE_ETH} from "../utils/ENSIP19.sol";
+import {ECNSIP19, COIN_TYPE_DEFAULT, COIN_TYPE_ETH} from "../utils/ECNSIP19.sol";
 
 abstract contract AbstractReverseResolver is
     IExtendedResolver,
@@ -55,7 +55,7 @@ abstract contract AbstractReverseResolver is
 
     /// @inheritdoc INameReverser
     function chainId() external view returns (uint32) {
-        return ENSIP19.chainFromCoinType(coinType);
+        return ECNSIP19.chainFromCoinType(coinType);
     }
 
     /// @dev Resolve one address to a name.
@@ -79,12 +79,12 @@ abstract contract AbstractReverseResolver is
     ) external view returns (bytes memory result) {
         bytes4 selector = bytes4(data);
         if (selector == INameResolver.name.selector) {
-            (bytes memory a, uint256 ct) = ENSIP19.parse(name);
+            (bytes memory a, uint256 ct) = ECNSIP19.parse(name);
             if (
                 a.length != 20 ||
                 !(
                     coinType == COIN_TYPE_DEFAULT
-                        ? ENSIP19.isEVMCoinType(ct)
+                        ? ECNSIP19.isEVMCoinType(ct)
                         : ct == coinType
                 )
             ) {
@@ -93,14 +93,14 @@ abstract contract AbstractReverseResolver is
             address addr = address(bytes20(a));
             return abi.encode(_resolveName(addr));
         } else if (selector == IAddrResolver.addr.selector) {
-            (bool valid, ) = ENSIP19.parseNamespace(name, 0);
+            (bool valid, ) = ECNSIP19.parseNamespace(name, 0);
             if (!valid) revert UnreachableName(name);
             return
                 abi.encode(
                     coinType == COIN_TYPE_ETH ? chainRegistrar : address(0)
                 );
         } else if (selector == IAddressResolver.addr.selector) {
-            (bool valid, ) = ENSIP19.parseNamespace(name, 0);
+            (bool valid, ) = ECNSIP19.parseNamespace(name, 0);
             if (!valid) revert UnreachableName(name);
             (, uint256 ct) = abi.decode(data[4:], (bytes32, uint256));
             return

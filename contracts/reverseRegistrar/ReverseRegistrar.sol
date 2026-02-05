@@ -2,7 +2,7 @@ pragma solidity >=0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "../registry/ENS.sol";
+import "../registry/ECNS.sol";
 import "./IReverseRegistrar.sol";
 import "../root/Controllable.sol";
 
@@ -17,20 +17,20 @@ bytes32 constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967f
 // namehash('addr.reverse')
 
 contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     NameResolver public defaultResolver;
 
     event ReverseClaimed(address indexed addr, bytes32 indexed node);
     event DefaultResolverChanged(NameResolver indexed resolver);
 
     /// @dev Constructor
-    /// @param ensAddr The address of the ENS registry.
-    constructor(ENS ensAddr) {
-        ens = ensAddr;
+    /// @param ecnsAddr The address of the ECNS registry.
+    constructor(ECNS ecnsAddr) {
+        ecns = ecnsAddr;
 
         // Assign ownership of the reverse record to our deployer
         ReverseRegistrar oldRegistrar = ReverseRegistrar(
-            ensAddr.owner(ADDR_REVERSE_NODE)
+            ecnsAddr.owner(ADDR_REVERSE_NODE)
         );
         if (address(oldRegistrar) != address(0x0)) {
             oldRegistrar.claim(msg.sender);
@@ -41,7 +41,7 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
         require(
             addr == msg.sender ||
                 controllers[msg.sender] ||
-                ens.isApprovedForAll(addr, msg.sender) ||
+                ecns.isApprovedForAll(addr, msg.sender) ||
                 ownsContract(addr),
             "ReverseRegistrar: Caller is not a controller or authorised by address or the address itself"
         );
@@ -81,7 +81,7 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
             abi.encodePacked(ADDR_REVERSE_NODE, labelHash)
         );
         emit ReverseClaimed(addr, reverseNode);
-        ens.setSubnodeRecord(ADDR_REVERSE_NODE, labelHash, owner, resolver, 0);
+        ecns.setSubnodeRecord(ADDR_REVERSE_NODE, labelHash, owner, resolver, 0);
         return reverseNode;
     }
 

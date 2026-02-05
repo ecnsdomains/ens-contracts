@@ -11,7 +11,7 @@ import {AbstractReverseResolver} from "./AbstractReverseResolver.sol";
 import {IStandaloneReverseRegistrar} from "../reverseRegistrar/IStandaloneReverseRegistrar.sol";
 import {IVerifiableResolver} from "../resolvers/profiles/IVerifiableResolver.sol";
 import {INameReverser} from "./INameReverser.sol";
-import {ENSIP19} from "../utils/ENSIP19.sol";
+import {ECNSIP19} from "../utils/ECNSIP19.sol";
 
 /// @title Chain Reverse Resolver
 /// @notice Reverses an EVM address using the first non-null response from the following sources:
@@ -71,7 +71,7 @@ contract ChainReverseResolver is
     function verifierMetadata(
         bytes memory name
     ) external view returns (address verifier, string[] memory gateways) {
-		 (bytes memory a, uint256 ct) = ENSIP19.parse(name);
+		 (bytes memory a, uint256 ct) = ECNSIP19.parse(name);
 		 if (a.length == 20 && ct == coinType) {
 			return (address(gatewayVerifier), gatewayURLs);
 		 }

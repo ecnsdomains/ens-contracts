@@ -1,19 +1,19 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import {INameWrapperUpgrade} from "../INameWrapperUpgrade.sol";
-import "../../registry/ENS.sol";
-import "../../ethregistrar/IBaseRegistrar.sol";
+import "../../registry/ECNS.sol";
+import "../../etcregistrar/IBaseRegistrar.sol";
 import {NameCoder} from "../../utils/NameCoder.sol";
 
 contract UpgradedNameWrapperMock is INameWrapperUpgrade {
     bytes32 private constant ETH_NODE =
         0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
 
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     IBaseRegistrar public immutable registrar;
 
-    constructor(ENS _ens, IBaseRegistrar _registrar) {
-        ens = _ens;
+    constructor(ECNS _ecns, IBaseRegistrar _registrar) {
+        ecns = _ecns;
         registrar = _registrar;
     }
 
@@ -46,10 +46,10 @@ contract UpgradedNameWrapperMock is INameWrapperUpgrade {
                 "No approval for registrar"
             );
         } else {
-            address owner = ens.owner(node);
+            address owner = ecns.owner(node);
             require(
                 msg.sender == owner &&
-                    ens.isApprovedForAll(owner, address(this)),
+                    ecns.isApprovedForAll(owner, address(this)),
                 "No approval for registry"
             );
         }

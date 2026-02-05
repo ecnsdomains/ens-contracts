@@ -9,7 +9,7 @@ import "../../contracts/resolvers/profiles/IExtendedResolver.sol";
 import "../../contracts/resolvers/profiles/IExtendedDNSResolver.sol";
 import "../dnssec-oracle/DNSSEC.sol";
 import "../dnssec-oracle/RRUtils.sol";
-import "../registry/ENSRegistry.sol";
+import "../registry/ECNSRegistry.sol";
 import "../utils/HexUtils.sol";
 import "../utils/BytesUtils.sol";
 import {IDNSGateway} from "../dnssec-oracle/IDNSGateway.sol";
@@ -27,14 +27,14 @@ contract OffchainDNSResolver is IExtendedResolver, IERC165 {
     using BytesUtils for bytes;
     using HexUtils for bytes;
 
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     DNSSEC public immutable oracle;
     string public gatewayURL;
 
     error CouldNotResolve(bytes name);
 
-    constructor(ENS _ens, DNSSEC _oracle, string memory _gatewayURL) {
-        ens = _ens;
+    constructor(ECNS _ecns, DNSSEC _oracle, string memory _gatewayURL) {
+        ecns = _ecns;
         oracle = _oracle;
         gatewayURL = _gatewayURL;
     }
@@ -215,7 +215,7 @@ contract OffchainDNSResolver is IExtendedResolver, IERC165 {
         uint256 lastIdx
     ) internal view returns (address) {
         bytes32 node = textNamehash(name, idx, lastIdx);
-        address resolver = ens.resolver(node);
+        address resolver = ecns.resolver(node);
         if (resolver == address(0)) {
             return address(0);
         }

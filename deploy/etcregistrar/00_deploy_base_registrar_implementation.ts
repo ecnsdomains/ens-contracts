@@ -14,13 +14,13 @@ export default deployScript(
     await deploy('BaseRegistrarImplementation', {
       account: deployer,
       artifact: artifacts.BaseRegistrarImplementation,
-      args: [registry.address, namehash('eth')],
+      args: [registry.address, namehash('etc')],
     })
   },
   {
     id: 'BaseRegistrarImplementation:contract v1.0.0',
     tags: [
-      'category:ethregistrar',
+      'category:etcregistrar',
       'BaseRegistrarImplementation',
       'BaseRegistrarImplementation:contract',
     ],

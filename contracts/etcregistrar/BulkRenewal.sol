@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import "../registry/ENS.sol";
-import "./ETHRegistrarController.sol";
-import "./IETHRegistrarController.sol";
+import "../registry/ECNS.sol";
+import "./ETCRegistrarController.sol";
+import "./IETCRegistrarController.sol";
 import "../resolvers/Resolver.sol";
 import "./IBulkRenewal.sol";
 import "./IPriceOracle.sol";
@@ -14,19 +14,19 @@ contract BulkRenewal is IBulkRenewal {
     bytes32 private constant ETH_NAMEHASH =
         0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
 
-    ENS public immutable ens;
+    ECNS public immutable ecns;
 
-    constructor(ENS _ens) {
-        ens = _ens;
+    constructor(ECNS _ecns) {
+        ecns = _ecns;
     }
 
-    function getController() internal view returns (ETHRegistrarController) {
-        Resolver r = Resolver(ens.resolver(ETH_NAMEHASH));
+    function getController() internal view returns (ETCRegistrarController) {
+        Resolver r = Resolver(ecns.resolver(ETH_NAMEHASH));
         return
-            ETHRegistrarController(
+            ETCRegistrarController(
                 r.interfaceImplementer(
                     ETH_NAMEHASH,
-                    type(IETHRegistrarController).interfaceId
+                    type(IETCRegistrarController).interfaceId
                 )
             );
     }
@@ -35,7 +35,7 @@ contract BulkRenewal is IBulkRenewal {
         string[] calldata names,
         uint256 duration
     ) external view override returns (uint256 total) {
-        ETHRegistrarController controller = getController();
+        ETCRegistrarController controller = getController();
         uint256 length = names.length;
         for (uint256 i = 0; i < length; ) {
             IPriceOracle.Price memory price = controller.rentPrice(
@@ -54,7 +54,7 @@ contract BulkRenewal is IBulkRenewal {
         uint256 duration,
         bytes32 referrer
     ) external payable override {
-        ETHRegistrarController controller = getController();
+        ETCRegistrarController controller = getController();
         uint256 length = names.length;
         uint256 total;
         for (uint256 i = 0; i < length; ) {

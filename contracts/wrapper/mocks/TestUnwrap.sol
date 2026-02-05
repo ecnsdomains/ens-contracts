@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
-import "../../registry/ENS.sol";
-import "../../ethregistrar/IBaseRegistrar.sol";
+import "../../registry/ECNS.sol";
+import "../../etcregistrar/IBaseRegistrar.sol";
 import {NameCoder} from "../../utils/NameCoder.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -9,12 +9,12 @@ contract TestUnwrap is Ownable {
     bytes32 private constant ETH_NODE =
         0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
 
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     IBaseRegistrar public immutable registrar;
     mapping(address => bool) public approvedWrapper;
 
-    constructor(ENS _ens, IBaseRegistrar _registrar) {
-        ens = _ens;
+    constructor(ECNS _ecns, IBaseRegistrar _registrar) {
+        ecns = _ecns;
         registrar = _registrar;
     }
 
@@ -91,16 +91,16 @@ contract TestUnwrap is Ownable {
         address newOwner,
         address sender
     ) private {
-        address owner = ens.owner(node);
+        address owner = ecns.owner(node);
 
         require(
             approvedWrapper[sender] &&
                 owner == sender &&
-                ens.isApprovedForAll(owner, address(this)),
+                ecns.isApprovedForAll(owner, address(this)),
             "Unauthorised"
         );
 
-        ens.setOwner(node, newOwner);
+        ecns.setOwner(node, newOwner);
     }
 
     function _makeNode(

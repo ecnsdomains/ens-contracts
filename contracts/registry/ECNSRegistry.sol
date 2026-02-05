@@ -1,9 +1,9 @@
 pragma solidity >=0.8.4;
 
-import "./ENS.sol";
+import "./ECNS.sol";
 
-/// The ENS registry contract.
-contract ENSRegistry is ENS {
+/// The ECNS registry contract.
+contract ECNSRegistry is ECNS {
     struct Record {
         address owner;
         address resolver;

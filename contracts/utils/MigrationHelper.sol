@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.4;
 
-import {IBaseRegistrar} from "../ethregistrar/IBaseRegistrar.sol";
+import {IBaseRegistrar} from "../etcregistrar/IBaseRegistrar.sol";
 import {INameWrapper} from "../wrapper/INameWrapper.sol";
 import {Controllable} from "../wrapper/Controllable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";

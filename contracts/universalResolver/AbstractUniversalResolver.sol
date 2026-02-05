@@ -9,7 +9,7 @@ import {CCIPBatcher, CCIPReader} from "../ccipRead/CCIPBatcher.sol";
 import {IGatewayProvider} from "../ccipRead/IGatewayProvider.sol";
 import {NameCoder} from "../utils/NameCoder.sol";
 import {BytesUtils} from "../utils/BytesUtils.sol";
-import {ENSIP19, COIN_TYPE_ETH, COIN_TYPE_DEFAULT} from "../utils/ENSIP19.sol";
+import {ECNSIP19, COIN_TYPE_ETH, COIN_TYPE_DEFAULT} from "../utils/ECNSIP19.sol";
 import {IERC7996} from "../utils/IERC7996.sol";
 import {ResolverFeatures} from "../resolvers/ResolverFeatures.sol";
 
@@ -63,7 +63,7 @@ abstract contract AbstractUniversalResolver is
     function requireResolver(
         bytes memory name
     ) public view returns (ResolverInfo memory info) {
-        // https://docs.ens.domains/ensip/10
+        // https://docs.ecns.domains/ensip/10
         (info.resolver, info.node, info.offset) = findResolver(name);
         info.name = name;
         _checkResolver(info);
@@ -196,9 +196,9 @@ abstract contract AbstractUniversalResolver is
         primary;
         resolver;
         reverseResolver;
-        // https://docs.ens.domains/ensip/19
+        // https://docs.ecns.domains/ensip/19
         ResolverInfo memory info = requireResolver(
-            NameCoder.encode(ENSIP19.reverseName(lookupAddress, coinType)) // reverts EmptyAddress
+            NameCoder.encode(ECNSIP19.reverseName(lookupAddress, coinType)) // reverts EmptyAddress
         );
         _callResolver(
             info,

@@ -1,6 +1,6 @@
 import { artifacts, deployScript } from '@rocketh'
 import type { Abi } from 'viem'
-import legacyArtifactRaw from '../../deployments/archive/ETHRegistrarController_mainnet_9380471.sol/ETHRegistrarController_mainnet_9380471.json'
+import legacyArtifactRaw from '../../deployments/archive/ETCRegistrarController_mainnet_9380471.sol/ETCRegistrarController_mainnet_9380471.json'
 
 const legacyArtifact = {
   ...legacyArtifactRaw,
@@ -28,14 +28,14 @@ export default deployScript(
       (typeof artifacts.ExponentialPremiumPriceOracle)['abi']
     >('ExponentialPremiumPriceOracle')
 
-    const controller = await deploy('LegacyETHRegistrarController', {
+    const controller = await deploy('LegacyETCRegistrarController', {
       account: deployer,
       artifact: legacyArtifact,
       args: [registrar.address, priceOracle.address, 60n, 86400n],
     })
 
     console.log(
-      `  - Adding LegacyETHRegistrarController via RegistrarSecurityController`,
+      `  - Adding LegacyETCRegistrarController via RegistrarSecurityController`,
     )
     await write(registrarSecurityController, {
       functionName: 'addRegistrarController',
@@ -49,8 +49,8 @@ export default deployScript(
     }
   },
   {
-    id: 'ETHRegistrarController v1.0.0',
-    tags: ['category:ethregistrar', 'LegacyETHRegistrarController'],
+    id: 'ETCRegistrarController v1.0.0',
+    tags: ['category:etcregistrar', 'LegacyETCRegistrarController'],
     dependencies: [
       'BaseRegistrarImplementation',
       'RegistrarSecurityController',

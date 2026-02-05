@@ -1,16 +1,16 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import "./ETHRegistrarController.sol";
+import "./ETCRegistrarController.sol";
 import "./IBulkRenewal.sol";
 import "./IPriceOracle.sol";
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 contract StaticBulkRenewal is IBulkRenewal {
-    ETHRegistrarController controller;
+    ETCRegistrarController controller;
 
-    constructor(ETHRegistrarController _controller) {
+    constructor(ETCRegistrarController _controller) {
         controller = _controller;
     }
 

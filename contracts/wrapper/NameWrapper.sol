@@ -6,10 +6,10 @@ import {Controllable} from "./Controllable.sol";
 import {INameWrapper, CANNOT_UNWRAP, CANNOT_BURN_FUSES, CANNOT_TRANSFER, CANNOT_SET_RESOLVER, CANNOT_SET_TTL, CANNOT_CREATE_SUBDOMAIN, CANNOT_APPROVE, PARENT_CANNOT_CONTROL, CAN_DO_EVERYTHING, IS_DOT_ETH, CAN_EXTEND_EXPIRY, PARENT_CONTROLLED_FUSES, USER_SETTABLE_FUSES} from "./INameWrapper.sol";
 import {INameWrapperUpgrade} from "./INameWrapperUpgrade.sol";
 import {IMetadataService} from "./IMetadataService.sol";
-import {ENS} from "../registry/ENS.sol";
+import {ECNS} from "../registry/ECNS.sol";
 import {IReverseRegistrar} from "../reverseRegistrar/IReverseRegistrar.sol";
 import {ReverseClaimer} from "../reverseRegistrar/ReverseClaimer.sol";
-import {IBaseRegistrar} from "../ethregistrar/IBaseRegistrar.sol";
+import {IBaseRegistrar} from "../etcregistrar/IBaseRegistrar.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -39,7 +39,7 @@ contract NameWrapper is
 {
     using BytesUtils_LEGACY for bytes;
 
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     IBaseRegistrar public immutable registrar;
     IMetadataService public metadataService;
     mapping(bytes32 => bytes) public names;
@@ -57,11 +57,11 @@ contract NameWrapper is
     uint64 private constant MAX_EXPIRY = type(uint64).max;
 
     constructor(
-        ENS _ens,
+        ECNS _ecns,
         IBaseRegistrar _registrar,
         IMetadataService _metadataService
-    ) ReverseClaimer(_ens, msg.sender) {
-        ens = _ens;
+    ) ReverseClaimer(_ecns, msg.sender) {
+        ecns = _ecns;
         registrar = _registrar;
         metadataService = _metadataService;
 
@@ -80,7 +80,7 @@ contract NameWrapper is
             MAX_EXPIRY
         );
         names[ROOT_NODE] = "\x00";
-        names[ETH_NODE] = "\x03eth\x00";
+        names[ETH_NODE] = "\x03etc\x00";
     }
 
     function supportsInterface(
@@ -95,7 +95,7 @@ contract NameWrapper is
     /* ERC1155 Fuse */
 
     /// @notice Gets the owner of a name
-    /// @param id Label as a string of the .eth domain to wrap
+    /// @param id Label as a string of the .etc domain to wrap
     /// @return owner The owner of the name
     function ownerOf(
         uint256 id
@@ -186,14 +186,14 @@ contract NameWrapper is
     ) public onlyOwner {
         if (address(upgradeContract) != address(0)) {
             registrar.setApprovalForAll(address(upgradeContract), false);
-            ens.setApprovalForAll(address(upgradeContract), false);
+            ecns.setApprovalForAll(address(upgradeContract), false);
         }
 
         upgradeContract = _upgradeAddress;
 
         if (address(upgradeContract) != address(0)) {
             registrar.setApprovalForAll(address(upgradeContract), true);
-            ens.setApprovalForAll(address(upgradeContract), true);
+            ecns.setApprovalForAll(address(upgradeContract), true);
         }
     }
 
@@ -237,9 +237,9 @@ contract NameWrapper is
             !_isETH2LDInGracePeriod(fuses, expiry);
     }
 
-    /// @notice Wraps a .eth domain, creating a new token and sending the original ERC721 token to this contract
-    /// @dev Can be called by the owner of the name on the .eth registrar or an authorised caller on the registrar
-    /// @param label Label as a string of the .eth domain to wrap
+    /// @notice Wraps a .etc domain, creating a new token and sending the original ERC721 token to this contract
+    /// @dev Can be called by the owner of the name on the .etc registrar or an authorised caller on the registrar
+    /// @param label Label as a string of the .etc domain to wrap
     /// @param wrappedOwner Owner of the name in this contract
     /// @param ownerControlledFuses Initial owner-controlled fuses to set
     /// @param resolver Resolver contract address
@@ -278,14 +278,14 @@ contract NameWrapper is
         );
     }
 
-    /// @dev Registers a new .eth second-level domain and wraps it.
+    /// @dev Registers a new .etc second-level domain and wraps it.
     ///      Only callable by authorised controllers.
     /// @param label The label to register (Eg, 'foo' for 'foo.eth').
     /// @param wrappedOwner The owner of the wrapped name.
     /// @param duration The duration, in seconds, to register the name for.
     /// @param resolver The resolver address to set on the ENS registry (optional).
     /// @param ownerControlledFuses Initial owner-controlled fuses to set
-    /// @return registrarExpiry The expiry date of the new name on the .eth registrar, in seconds since the Unix epoch.
+    /// @return registrarExpiry The expiry date of the new name on the .etc registrar, in seconds since the Unix epoch.
     function registerAndWrapETH2LD(
         string calldata label,
         address wrappedOwner,
@@ -304,11 +304,11 @@ contract NameWrapper is
         );
     }
 
-    /// @notice Renews a .eth second-level domain.
+    /// @notice Renews a .etc second-level domain.
     /// @dev Only callable by authorised controllers.
     /// @param tokenId The hash of the label to register (eg, `keccak256('foo')`, for 'foo.eth').
     /// @param duration The number of seconds to renew the name for.
-    /// @return expires The expiry date of the name on the .eth registrar, in seconds since the Unix epoch.
+    /// @return expires The expiry date of the name on the .etc registrar, in seconds since the Unix epoch.
     function renew(
         uint256 tokenId,
         uint256 duration
@@ -321,7 +321,7 @@ contract NameWrapper is
         try registrar.ownerOf(tokenId) returns (address registrarOwner) {
             if (
                 registrarOwner != address(this) ||
-                ens.owner(node) != address(this)
+                ecns.owner(node) != address(this)
             ) {
                 return registrarExpiry;
             }
@@ -339,7 +339,7 @@ contract NameWrapper is
         return registrarExpiry;
     }
 
-    /// @notice Wraps a non .eth domain, of any kind. Could be a DNSSEC name vitalik.xyz or a subdomain
+    /// @notice Wraps a non .etc domain, of any kind. Could be a DNSSEC name vitalik.xyz or a subdomain
     /// @dev Can be called by the owner in the registry or an authorised caller in the registry
     /// @param name The name to wrap, in DNS format
     /// @param wrappedOwner Owner of the name in this contract
@@ -359,25 +359,25 @@ contract NameWrapper is
             revert IncompatibleParent();
         }
 
-        address owner = ens.owner(node);
+        address owner = ecns.owner(node);
 
-        if (owner != msg.sender && !ens.isApprovedForAll(owner, msg.sender)) {
+        if (owner != msg.sender && !ecns.isApprovedForAll(owner, msg.sender)) {
             revert Unauthorised(node, msg.sender);
         }
 
         if (resolver != address(0)) {
-            ens.setResolver(node, resolver);
+            ecns.setResolver(node, resolver);
         }
 
-        ens.setOwner(node, address(this));
+        ecns.setOwner(node, address(this));
 
         _wrap(node, name, wrappedOwner, 0, 0);
     }
 
-    /// @notice Unwraps a .eth domain. e.g. vitalik.eth
+    /// @notice Unwraps a .etc domain. e.g. vitalik.eth
     /// @dev Can be called by the owner in the wrapper or an authorised caller in the wrapper
-    /// @param labelhash Labelhash of the .eth domain
-    /// @param registrant Sets the owner in the .eth registrar to this address
+    /// @param labelhash Labelhash of the .etc domain
+    /// @param registrant Sets the owner in the .etc registrar to this address
     /// @param controller Sets the owner in the registry to this address
     function unwrapETH2LD(
         bytes32 labelhash,
@@ -395,7 +395,7 @@ contract NameWrapper is
         );
     }
 
-    /// @notice Unwraps a non .eth domain, of any kind. Could be a DNSSEC name vitalik.xyz or a subdomain
+    /// @notice Unwraps a non .etc domain, of any kind. Could be a DNSSEC name vitalik.xyz or a subdomain
     /// @dev Can be called by the owner in the wrapper or an authorised caller in the wrapper
     /// @param parentNode Parent namehash of the name e.g. vitalik.xyz would be namehash('xyz')
     /// @param labelhash Labelhash of the name, e.g. vitalik.xyz would be keccak256('vitalik')
@@ -525,7 +525,7 @@ contract NameWrapper is
         (address owner, uint32 oldFuses, uint64 oldExpiry) = getData(
             uint256(node)
         );
-        if (owner == address(0) || ens.owner(node) != address(this)) {
+        if (owner == address(0) || ecns.owner(node) != address(this)) {
             revert NameIsNotWrapped();
         }
         // max expiry is set to the expiry of the parent
@@ -577,7 +577,7 @@ contract NameWrapper is
         expiry = _checkParentFusesAndExpiry(parentNode, node, fuses, expiry);
 
         if (!_isWrapped(node)) {
-            ens.setSubnodeOwner(parentNode, labelhash, address(this));
+            ecns.setSubnodeOwner(parentNode, labelhash, address(this));
             _wrap(node, name, owner, fuses, expiry);
         } else {
             _updateName(parentNode, node, label, owner, fuses, expiry);
@@ -609,7 +609,7 @@ contract NameWrapper is
         _saveLabel(parentNode, node, label);
         expiry = _checkParentFusesAndExpiry(parentNode, node, fuses, expiry);
         if (!_isWrapped(node)) {
-            ens.setSubnodeRecord(
+            ecns.setSubnodeRecord(
                 parentNode,
                 labelhash,
                 address(this),
@@ -618,7 +618,7 @@ contract NameWrapper is
             );
             _storeNameAndWrap(parentNode, node, label, owner, fuses, expiry);
         } else {
-            ens.setSubnodeRecord(
+            ecns.setSubnodeRecord(
                 parentNode,
                 labelhash,
                 address(this),
@@ -647,7 +647,7 @@ contract NameWrapper is
             CANNOT_TRANSFER | CANNOT_SET_RESOLVER | CANNOT_SET_TTL
         )
     {
-        ens.setRecord(node, address(this), resolver, ttl);
+        ecns.setRecord(node, address(this), resolver, ttl);
         if (owner == address(0)) {
             (, uint32 fuses, ) = getData(uint256(node));
             if (fuses & IS_DOT_ETH == IS_DOT_ETH) {
@@ -667,7 +667,7 @@ contract NameWrapper is
         bytes32 node,
         address resolver
     ) public onlyTokenOwner(node) operationAllowed(node, CANNOT_SET_RESOLVER) {
-        ens.setResolver(node, resolver);
+        ecns.setResolver(node, resolver);
     }
 
     /// @notice Sets TTL in the registry
@@ -677,7 +677,7 @@ contract NameWrapper is
         bytes32 node,
         uint64 ttl
     ) public onlyTokenOwner(node) operationAllowed(node, CANNOT_SET_TTL) {
-        ens.setTTL(node, ttl);
+        ecns.setTTL(node, ttl);
     }
 
     /// @dev Allows an operation only if none of the specified fuses are burned.
@@ -717,7 +717,7 @@ contract NameWrapper is
             // protects a name that has been unwrapped with PCC and doesn't allow the parent to take control by recreating it if unexpired
             (subnodeOwner == address(0) ||
                 // protects a name that has been burnt and doesn't allow the parent to take control by recreating it if unexpired
-                ens.owner(subnode) == address(0))
+                ecns.owner(subnode) == address(0))
         ) {
             (, uint32 parentFuses, ) = getData(uint256(parentNode));
             if (parentFuses & CANNOT_CREATE_SUBDOMAIN != 0) {
@@ -1003,7 +1003,7 @@ contract NameWrapper is
         bytes32 labelhash = keccak256(bytes(label));
         bytes32 node = _makeNode(ETH_NODE, labelhash);
         // hardcode dns-encoded eth string for gas savings
-        bytes memory name = _addLabel(label, "\x03eth\x00");
+        bytes memory name = _addLabel(label, "\x03etc\x00");
         names[node] = name;
 
         _wrap(
@@ -1015,7 +1015,7 @@ contract NameWrapper is
         );
 
         if (resolver != address(0)) {
-            ens.setResolver(node, resolver);
+            ecns.setResolver(node, resolver);
         }
     }
 
@@ -1026,7 +1026,7 @@ contract NameWrapper is
 
         // Burn token and fuse data
         _burn(uint256(node));
-        ens.setOwner(node, owner);
+        ecns.setOwner(node, owner);
 
         emit NameUnwrapped(node, owner);
     }
@@ -1076,7 +1076,7 @@ contract NameWrapper is
     function _isWrapped(bytes32 node) internal view returns (bool) {
         return
             ownerOf(uint256(node)) != address(0) &&
-            ens.owner(node) == address(this);
+            ecns.owner(node) == address(this);
     }
 
     function _isETH2LDInGracePeriod(

@@ -2,19 +2,19 @@
 pragma solidity ~0.8.17;
 
 import {INameWrapper} from "../INameWrapper.sol";
-import {ENS} from "../../registry/ENS.sol";
+import {ECNS} from "../../registry/ECNS.sol";
 import {NameCoder} from "../../utils/NameCoder.sol";
 import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 contract NameGriefer is IERC1155Receiver {
-    ENS public immutable ens;
+    ECNS public immutable ecns;
     INameWrapper public immutable wrapper;
 
     constructor(INameWrapper _wrapper) {
         wrapper = _wrapper;
-        ENS _ens = _wrapper.ens();
-        ens = _ens;
-        _ens.setApprovalForAll(address(_wrapper), true);
+        ECNS _ecns = _wrapper.ecns();
+        ecns = _ecns;
+        _ecns.setApprovalForAll(address(_wrapper), true);
     }
 
     function destroy(bytes calldata name) public {

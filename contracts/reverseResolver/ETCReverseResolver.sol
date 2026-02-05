@@ -2,11 +2,11 @@
 pragma solidity ^0.8.17;
 
 import {AbstractReverseResolver} from "./AbstractReverseResolver.sol";
-import {ENS} from "../registry/ENS.sol";
+import {ECNS} from "../registry/ECNS.sol";
 import {INameResolver} from "../resolvers/profiles/INameResolver.sol";
 import {IStandaloneReverseRegistrar} from "../reverseRegistrar/IStandaloneReverseRegistrar.sol";
 import {INameReverser} from "./INameReverser.sol";
-import {COIN_TYPE_ETH} from "../utils/ENSIP19.sol";
+import {COIN_TYPE_ETH} from "../utils/ECNSIP19.sol";
 import {NameCoder} from "../utils/NameCoder.sol";
 import {HexUtils} from "../utils/HexUtils.sol";
 import {LibABI} from "../utils/LibABI.sol";
@@ -18,23 +18,23 @@ import {LibABI} from "../utils/LibABI.sol";
 /// 2. `name()` from "{addr}.addr.reverse" in V1 Registry
 /// 3. `IStandaloneReverseRegistrar` for "default.reverse"
 ///
-contract ETHReverseResolver is AbstractReverseResolver {
+contract ETCReverseResolver is AbstractReverseResolver {
     /// @dev Namehash of "addr.reverse"
     bytes32 constant ADDR_REVERSE_NODE =
         0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
     /// @notice The ENS registry contract.
-    ENS immutable ens;
+    ECNS immutable ecns;
 
     /// @notice The reverse registrar contract for "default.reverse".
     IStandaloneReverseRegistrar public immutable defaultRegistrar;
 
     constructor(
-        ENS _ens,
+        ECNS _ecns,
         IStandaloneReverseRegistrar addrRegistrar,
         IStandaloneReverseRegistrar _defaultRegistrar
     ) AbstractReverseResolver(COIN_TYPE_ETH, address(addrRegistrar)) {
-        ens = _ens;
+        ecns = _ecns;
         defaultRegistrar = _defaultRegistrar;
     }
 
@@ -50,7 +50,7 @@ contract ETHReverseResolver is AbstractReverseResolver {
             ADDR_REVERSE_NODE,
             keccak256(bytes(HexUtils.addressToHex(addr)))
         );
-        address resolver = ens.resolver(node);
+        address resolver = ecns.resolver(node);
         if (resolver != address(0)) {
             // note: this only supports onchain direct calls (no extended, no offchain)
             (bool ok, bytes memory v) = resolver.staticcall{gas: 100_000}(

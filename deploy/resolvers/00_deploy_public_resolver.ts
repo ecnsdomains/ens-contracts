@@ -9,8 +9,8 @@ export default deployScript(
     const registry = get<(typeof artifacts.ENSRegistry)['abi']>('ENSRegistry')
     const nameWrapper =
       get<(typeof artifacts.NameWrapper)['abi']>('NameWrapper')
-    const controller = get<(typeof artifacts.ETHRegistrarController)['abi']>(
-      'ETHRegistrarController',
+    const controller = get<(typeof artifacts.ETCRegistrarController)['abi']>(
+      'ETCRegistrarController',
     )
     const reverseRegistrar =
       get<(typeof artifacts.ReverseRegistrar)['abi']>('ReverseRegistrar')
@@ -81,7 +81,7 @@ export default deployScript(
     dependencies: [
       'ENSRegistry',
       'NameWrapper',
-      'ETHRegistrarController',
+      'ETCRegistrarController',
       'ReverseRegistrar',
     ],
   },

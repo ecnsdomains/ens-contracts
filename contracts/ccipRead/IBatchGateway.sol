@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 /// @notice Interface for Batch Gateway Offchain Lookup Protocol.
-///         https://docs.ens.domains/ensip/21/
+///         https://docs.ecns.domains/ensip/21/
 /// @dev Interface selector: `0xa780bab6`
 interface IBatchGateway {
     /// @notice An HTTP error occurred.

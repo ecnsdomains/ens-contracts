@@ -14,8 +14,8 @@ string constant SLUG_DEFAULT = "default"; // <=> COIN_TYPE_DEFAULT
 string constant TLD_REVERSE = "reverse";
 
 /// @dev Library for generating reverse names according to ENSIP-19.
-/// https://docs.ens.domains/ensip/19
-library ENSIP19 {
+/// https://docs.ecns.domains/ensip/19
+library ECNSIP19 {
     /// @dev The supplied address was `0x`.
     ///      Error selector: `0x7138356f`
     error EmptyAddress();

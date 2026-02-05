@@ -55,12 +55,12 @@ export default deployScript(
 
     const resolver = await read(registry, {
       functionName: 'resolver',
-      args: [namehash('eth')],
+      args: [namehash('etc')],
     })
 
     if (resolver === zeroAddress) {
       console.warn(
-        `  - WARN: No resolver set for .eth; not setting interface ${interfaceId} for NameWrapper`,
+        `  - WARN: No resolver set for .etc; not setting interface ${interfaceId} for NameWrapper`,
       )
       return
     }
@@ -69,14 +69,14 @@ export default deployScript(
     const ownedResolver =
       get<(typeof artifacts.OwnedResolver)['abi']>('OwnedResolver')
     console.log(
-      `  - Setting NameWrapper interface ID ${interfaceId} on .eth resolver`,
+      `  - Setting NameWrapper interface ID ${interfaceId} on .etc resolver`,
     )
     await tx({
       to: resolver as Address,
       data: encodeFunctionData({
         abi: ownedResolver.abi,
         functionName: 'setInterface',
-        args: [namehash('eth'), interfaceId, nameWrapper.address],
+        args: [namehash('etc'), interfaceId, nameWrapper.address],
       }),
       account: owner,
     })

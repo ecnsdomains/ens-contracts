@@ -22,7 +22,7 @@ import "../../utils/BytesUtils.sol";
 ///          ENS1 <address or name of ExtendedDNSResolver> <record data>
 ///
 ///      For example:
-///          ENS1 2.dnsname.ens.eth a[60]=0x1234...
+///          ENS1 2.dnsname.ecns.eth a[60]=0x1234...
 ///
 ///      The record data consists of a series of key=value pairs, separated by spaces. Keys
 ///      may have an optional argument in square brackets, and values may be either unquoted
@@ -60,7 +60,7 @@ import "../../utils/BytesUtils.sol";
 ///       - t[<key>] - Specifies how a `text()` request should be resolved for the specified `key`.
 ///         Examples:
 ///          - t[com.twitter]=nicksdjohnson
-///          - t[url]='https://ens.domains/'
+///          - t[url]='https://ecns.domains/'
 ///          - t[note]='I\'m great'
 contract ExtendedDNSResolver is IExtendedDNSResolver, IERC165 {
     using HexUtils for *;
@@ -100,7 +100,7 @@ contract ExtendedDNSResolver is IExtendedDNSResolver, IERC165 {
     ) internal pure returns (bytes memory) {
         (, uint256 coinType) = abi.decode(data[4:], (bytes32, uint256));
         bytes memory value;
-        // Per https://docs.ens.domains/ensip/11#specification
+        // Per https://docs.ecns.domains/ensip/11#specification
         if (coinType & 0x80000000 != 0) {
             value = _findValue(
                 context,

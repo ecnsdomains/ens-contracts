@@ -20,7 +20,7 @@ library DNSClaimChecker {
         bytes memory name,
         bytes memory data
     ) internal pure returns (address, bool) {
-        // Add "_ens." to the front of the name.
+        // Add "_ecns." to the front of the name.
         Buffer.buffer memory buf;
         buf.init(name.length + 5);
         buf.append("\x04_ens");

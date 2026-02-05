@@ -29,7 +29,7 @@ export default deployScript(
   {
     id: 'ExponentialPremiumPriceOracle v1.0.0',
     tags: [
-      'category:ethregistrar',
+      'category:etcregistrar',
       'ExponentialPremiumPriceOracle',
       'DummyOracle',
     ],

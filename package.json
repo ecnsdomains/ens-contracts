@@ -1,7 +1,7 @@
 {
-  "name": "@ensdomains/ens-contracts",
-  "version": "1.6.2",
-  "description": "ENS contracts",
+  "name": "@ecnsdomains/ecns-contracts",
+  "version": "0.1.0",
+  "description": "ECNS contracts for Ethereum Classic Name Service",
   "type": "module",
   "scripts": {
     "compile": "hardhat compile",
@@ -78,15 +78,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ensdomains/ens-contracts.git"
+    "url": "git+https://github.com/ecnsdomains/ens-contracts.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ensdomains/ens-contracts/issues"
+    "url": "https://github.com/ecnsdomains/ens-contracts/issues"
   },
-  "homepage": "https://github.com/ensdomains/ens-contracts#readme",
+  "homepage": "https://github.com/ecnsdomains/ens-contracts#readme",
   "volta": {
     "node": "24.6.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "clones-with-immutable-args",
+      "esbuild",
+      "fsevents"
+    ]
   }
 }

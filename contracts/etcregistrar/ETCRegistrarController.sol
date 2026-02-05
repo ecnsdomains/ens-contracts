@@ -8,16 +8,16 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {BaseRegistrarImplementation} from "./BaseRegistrarImplementation.sol";
 import {StringUtils} from "../utils/StringUtils.sol";
 import {Resolver} from "../resolvers/Resolver.sol";
-import {ENS} from "../registry/ENS.sol";
+import {ECNS} from "../registry/ECNS.sol";
 import {IReverseRegistrar} from "../reverseRegistrar/IReverseRegistrar.sol";
 import {IDefaultReverseRegistrar} from "../reverseRegistrar/IDefaultReverseRegistrar.sol";
-import {IETHRegistrarController, IPriceOracle} from "./IETHRegistrarController.sol";
+import {IETCRegistrarController, IPriceOracle} from "./IETCRegistrarController.sol";
 import {ERC20Recoverable} from "../utils/ERC20Recoverable.sol";
 
 /// @dev A registrar controller for registering and renewing names at fixed cost.
-contract ETHRegistrarController is
+contract ETCRegistrarController is
     Ownable,
-    IETHRegistrarController,
+    IETCRegistrarController,
     ERC165,
     ERC20Recoverable
 {
@@ -40,7 +40,7 @@ contract ETHRegistrarController is
     uint64 private constant MAX_EXPIRY = type(uint64).max;
 
     /// @notice The ENS registry.
-    ENS public immutable ens;
+    ECNS public immutable ecns;
 
     // @notice The base registrar implementation for the eth TLD.
     BaseRegistrarImplementation immutable base;
@@ -138,7 +138,7 @@ contract ETHRegistrarController is
         bytes32 referrer
     );
 
-    /// @notice Constructor for the ETHRegistrarController.
+    /// @notice Constructor for the ETCRegistrarController.
     ///
     /// @param _base The base registrar implementation for the eth TLD.
     /// @param _prices The price oracle for the eth TLD.
@@ -146,7 +146,7 @@ contract ETHRegistrarController is
     /// @param _maxCommitmentAge The maximum time a commitment can exist to be valid.
     /// @param _reverseRegistrar The registrar for addr.reverse.
     /// @param _defaultReverseRegistrar The registrar for default.reverse.
-    /// @param _ens The ENS registry.
+    /// @param _ecns The ENS registry.
     constructor(
         BaseRegistrarImplementation _base,
         IPriceOracle _prices,
@@ -154,7 +154,7 @@ contract ETHRegistrarController is
         uint256 _maxCommitmentAge,
         IReverseRegistrar _reverseRegistrar,
         IDefaultReverseRegistrar _defaultReverseRegistrar,
-        ENS _ens
+        ECNS _ecns
     ) {
         if (_maxCommitmentAge <= _minCommitmentAge)
             revert MaxCommitmentAgeTooLow();
@@ -162,7 +162,7 @@ contract ETHRegistrarController is
         if (_maxCommitmentAge > block.timestamp)
             revert MaxCommitmentAgeTooHigh();
 
-        ens = _ens;
+        ecns = _ecns;
         base = _base;
         prices = _prices;
         minCommitmentAge = _minCommitmentAge;
@@ -298,7 +298,7 @@ contract ETHRegistrarController is
             );
 
             bytes32 namehash = keccak256(abi.encodePacked(ETH_NODE, labelhash));
-            ens.setRecord(
+            ecns.setRecord(
                 namehash,
                 registration.owner,
                 registration.resolver,
@@ -321,12 +321,12 @@ contract ETHRegistrarController is
                     msg.sender,
                     msg.sender,
                     registration.resolver,
-                    string.concat(registration.label, ".eth")
+                    string.concat(registration.label, ".etc")
                 );
             if (registration.reverseRecord & REVERSE_RECORD_DEFAULT_BIT != 0)
                 defaultReverseRegistrar.setNameForAddr(
                     msg.sender,
-                    string.concat(registration.label, ".eth")
+                    string.concat(registration.label, ".etc")
                 );
         }
 
@@ -381,7 +381,7 @@ contract ETHRegistrarController is
         bytes4 interfaceID
     ) public view override returns (bool) {
         return
-            interfaceID == type(IETHRegistrarController).interfaceId ||
+            interfaceID == type(IETCRegistrarController).interfaceId ||
             super.supportsInterface(interfaceID);
     }
 
