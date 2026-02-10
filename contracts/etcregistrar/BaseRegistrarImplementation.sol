@@ -2,6 +2,7 @@ pragma solidity >=0.8.4;
 
 import "../registry/ECNS.sol";
 import "./IBaseRegistrar.sol";
+import "../nft/IECNSMetadataRenderer.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -10,11 +11,19 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
     mapping(uint256 => uint256) expiries;
     // The ENS registry
     ECNS public ecns;
-    // The namehash of the TLD this registrar owns (eg, .eth)
+    // The namehash of the TLD this registrar owns (eg, .etc)
     bytes32 public baseNode;
     // A map of addresses that are authorised to register and renew names.
     mapping(address => bool) public controllers;
     uint256 public constant GRACE_PERIOD = 90 days;
+
+    // NFT metadata
+    IECNSMetadataRenderer public metadataRenderer;
+    mapping(uint256 => string) public labels;
+
+    // Creator trait overrides (owner can assign custom traits to specific tokens)
+    mapping(uint256 => bytes16) public creatorTraits;
+
     bytes4 private constant INTERFACE_META_ID =
         bytes4(keccak256("supportsInterface(bytes4)"));
     bytes4 private constant ERC721_ID =
@@ -49,9 +58,14 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
             isApprovedForAll(owner, spender));
     }
 
-    constructor(ECNS _ecns, bytes32 _baseNode) ERC721("", "") {
+    constructor(
+        ECNS _ecns,
+        bytes32 _baseNode,
+        IECNSMetadataRenderer _metadataRenderer
+    ) ERC721("ECNS: Ethereum Classic Name Service", "ECNS") {
         ecns = _ecns;
         baseNode = _baseNode;
+        metadataRenderer = _metadataRenderer;
     }
 
     modifier live() {
@@ -63,6 +77,45 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
         require(controllers[msg.sender]);
         _;
     }
+
+    // =========================================================================
+    // NFT Metadata
+    // =========================================================================
+
+    /// @notice Returns the token URI with on-chain SVG artwork.
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "nonexistent token");
+        bytes16 traits = creatorTraits[tokenId];
+        if (traits == bytes16(0)) {
+            traits = bytes16(keccak256(abi.encodePacked(tokenId)));
+        }
+        return metadataRenderer.tokenURI(
+            tokenId,
+            labels[tokenId],
+            expiries[tokenId],
+            traits
+        );
+    }
+
+    /// @notice Set the metadata renderer contract. Owner only.
+    function setMetadataRenderer(IECNSMetadataRenderer _renderer) external onlyOwner {
+        metadataRenderer = _renderer;
+    }
+
+    // =========================================================================
+    // Creator Trait Overrides
+    // =========================================================================
+
+    /// @notice Manually assign custom trait bytes to a specific token. Owner only.
+    function setCreatorTraits(uint256 tokenId, bytes16 customTraits) external onlyOwner {
+        require(_exists(tokenId), "nonexistent token");
+        require(customTraits != bytes16(0), "invalid traits");
+        creatorTraits[tokenId] = customTraits;
+    }
+
+    // =========================================================================
+    // ERC721 Overrides
+    // =========================================================================
 
     /// @dev Gets the owner of the specified token ID. Names become unowned
     ///      when their registration expires.
@@ -112,7 +165,21 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
         address owner,
         uint256 duration
     ) external override returns (uint256) {
-        return _register(id, owner, duration, true);
+        return _register(id, owner, duration, true, "");
+    }
+
+    /// @dev Register a name with label storage for NFT metadata.
+    /// @param id The token ID (keccak256 of the label).
+    /// @param owner The address that should own the registration.
+    /// @param duration Duration in seconds for the registration.
+    /// @param label The name label string (e.g. "alice").
+    function registerWithLabel(
+        uint256 id,
+        address owner,
+        uint256 duration,
+        string calldata label
+    ) external returns (uint256) {
+        return _register(id, owner, duration, true, label);
     }
 
     /// @dev Register a name, without modifying the registry.
@@ -124,14 +191,15 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
         address owner,
         uint256 duration
     ) external returns (uint256) {
-        return _register(id, owner, duration, false);
+        return _register(id, owner, duration, false, "");
     }
 
     function _register(
         uint256 id,
         address owner,
         uint256 duration,
-        bool updateRegistry
+        bool updateRegistry,
+        string memory label
     ) internal live onlyController returns (uint256) {
         require(available(id));
         require(
@@ -140,6 +208,9 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
         ); // Prevent future overflow
 
         expiries[id] = block.timestamp + duration;
+        if (bytes(label).length > 0) {
+            labels[id] = label;
+        }
         if (_exists(id)) {
             // Name was previously owned, and expired
             _burn(id);

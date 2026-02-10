@@ -1,272 +1,152 @@
-# ENS
+# ECNS Contracts
 
-[![Build Status](https://travis-ci.org/ensdomains/ens-contracts.svg?branch=master)](https://travis-ci.org/ensdomains/ens-contracts)
+Smart contracts for the **Ethereum Classic Name Service** (ECNS) — a fork of [ENS](https://github.com/ensdomains/ens-contracts) adapted for Ethereum Classic.
 
-For documentation of the ENS system, see [docs.ens.domains](https://docs.ens.domains/).
+ECNS lets you replace `0x3b09...1537` with `myname.etc`.
 
-## npm package
+## Deployed Contracts (Mordor Testnet)
 
-This repo doubles as an npm package with the compiled JSON contracts
+| Contract | Address |
+|----------|---------|
+| ECNSRegistry | `0x29dd3a41973ec0551bcd195e46e8eb9801621c34` |
+| BaseRegistrar | `0xfbce90395535d6ae9448f55d676bde9a40215a37` |
+| ETCRegistrarController | `0x6d36c84926c2637448f2a7eabad3a0eed7f95b25` |
+| PublicResolver | `0xc1267bafafd08fe85580985b020b2df08d863ca4` |
+| ECNSMetadataRenderer | `0xb82b372b7a368a3f3c1ff9ba96128650f629194b` |
+| ECNSWordDictionary | `0xbbaf428472bbb7800c5bd255832a9858cead15fd` |
+| ETCswapFullOracle | `0x34bda98deb5862a7f387a60a1e3b01879eb5f3fe` |
+| ExponentialPremiumPriceOracle | `0xae4cdb10b803849766a2b695bca1a7df5a962b06` |
+| ReverseRegistrar | `0x0ebc22b513866796157a9fc9e86d23c3cddc28ab` |
 
-```js
-import {
-  BaseRegistrar,
-  BaseRegistrarImplementation,
-  BulkRenewal,
-  ENS,
-  ENSRegistry,
-  ENSRegistryWithFallback,
-  ETHRegistrarController,
-  FIFSRegistrar,
-  LinearPremiumPriceOracle,
-  PriceOracle,
-  PublicResolver,
-  Resolver,
-  ReverseRegistrar,
-  StablePriceOracle,
-  TestRegistrar,
-} from '@ensdomains/ens-contracts'
-```
+Full deployment details: [`deployments/mordor.json`](deployments/mordor.json)
 
-## Importing from solidity
+## Key Differences from ENS
 
-```
-// Registry
-import '@ensdomains/ens-contracts/contracts/registry/ENS.sol';
-import '@ensdomains/ens-contracts/contracts/registry/ENSRegistry.sol';
-import '@ensdomains/ens-contracts/contracts/registry/ENSRegistryWithFallback.sol';
-import '@ensdomains/ens-contracts/contracts/registry/ReverseRegistrar.sol';
-import '@ensdomains/ens-contracts/contracts/registry/TestRegistrar.sol';
-// EthRegistrar
-import '@ensdomains/ens-contracts/contracts/ethregistrar/BaseRegistrar.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/BaseRegistrarImplementation.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/BulkRenewal.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/ETHRegistrarController.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/LinearPremiumPriceOracle.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/PriceOracle.sol';
-import '@ensdomains/ens-contracts/contracts/ethregistrar/StablePriceOracle.sol';
-// Resolvers
-import '@ensdomains/ens-contracts/contracts/resolvers/PublicResolver.sol';
-import '@ensdomains/ens-contracts/contracts/resolvers/Resolver.sol';
-```
+- **TLD**: `.etc` instead of `.eth`
+- **Pricing Oracle**: ETCswap V2+V3 TWAP oracle (no Chainlink dependency)
+- **NFT Metadata**: On-chain SVG with holographic gradient cards, trait system (Tier, Character Class, Fluency, Pattern)
+- **Leetspeak Detection**: Dictionary-based verification with 3 decode strategies (Map A standard, Map A alternate, Map B calculator)
+- **Content Moderation**: On-chain word dictionary + 1,876 reserved offensive terms with leet variants
+- **Reserved Names**: Brand protection, trademark protection, premium auctions
 
-## Accessing to binary file.
+## Architecture
 
-If your environment does not have compiler, you can access to the raw hardhat artifacts files at `node_modules/@ensdomains/ens-contracts/artifacts/contracts/${modName}/${contractName}.sol/${contractName}.json`
+### NFT Trait System
 
-## Contracts
+Each `.etc` name is an ERC-721 NFT with on-chain SVG artwork. Traits are computed deterministically:
 
-## Registry
+| Trait | Values |
+|-------|--------|
+| **Tier** | Ultra Rare (1-2 char), Legendary (3), Epic (4), Rare (5-7), Uncommon (8-9), Common (10+) |
+| **Character Class** | Pure Alpha, Numeric, Alphanumeric, Leetspeak, Hyphenated |
+| **Fluency** | Euphonious, Fluent, Standard, Harsh |
+| **Pattern** | Standard, Palindrome, Repeating, Sequential |
 
-The ENS registry is the core contract that lies at the heart of ENS resolution. All ENS lookups start by querying the registry. The registry maintains a list of domains, recording the owner, resolver, and TTL for each, and allows the owner of a domain to make changes to that data. It also includes some generic registrars.
+### Dictionary-Based Leetspeak
 
-### ENS.sol
+The `ECNSWordDictionary` contract stores 3 on-chain word sets:
 
-Interface of the ENS Registry.
+1. **Words** (3,916) — English dictionary for verifying leet decodings
+2. **Iconic Leet** (75) — Culturally legendary leet forms that get Ultra Rare tier (e.g. `1337`, `31337`, `80085`)
+3. **Blacklist** (402) — Offensive terms for content moderation
 
-### ENSRegistry
+Three decode strategies are tried in order:
+- **Map A** (1->l): `4->a, 3->e, 1->l, 0->o, 5->s, 7->t, 8->b`
+- **Map A** (1->i): same but `1->i`
+- **Map B** (calculator): `4->h, 3->e, 7->l, 1->i, 0->o, 5->s, 8->b, 6->g, 9->g`
 
-Implementation of the ENS Registry, the central contract used to look up resolvers and owners for domains.
+A decoded string must be **all-alpha** AND **in the dictionary** to classify as Leetspeak. This prevents false positives like `42069` (decoded `a2o69` has digits -> not leet).
 
-### ENSRegistryWithFallback
+Leetspeak names get the same tier as their decoded word length, except iconic forms which always get Ultra Rare.
 
-The new implementation of the ENS Registry after [the 2020 ENS Registry Migration](https://docs.ens.domains/ens-migration-february-2020/technical-description#new-ens-deployment).
+### Pricing
 
-### FIFSRegistrar
+| Length | Annual Cost (USD) |
+|--------|-------------------|
+| 1 char | $640 |
+| 2 char | $160 |
+| 3 char | $640 |
+| 4 char | $160 |
+| 5+ char | $5 |
 
-Implementation of a simple first-in-first-served registrar, which issues (sub-)domains to the first account to request them.
+Prices are denominated in ETC via ETCswap oracle (V2 + V3 TWAP).
 
-### ReverseRegistrar
+## Development
 
-Implementation of the reverse registrar responsible for managing reverse resolution via the .addr.reverse special-purpose TLD.
-
-### TestRegistrar
-
-Implementation of the `.test` registrar facilitates easy testing of ENS on the Ethereum test networks. Currently deployed on Ropsten network, it provides functionality to instantly claim a domain for test purposes, which expires 28 days after it was claimed.
-
-## EthRegistrar
-
-Implements an [ENS](https://ens.domains/) registrar intended for the .eth TLD.
-
-These contracts were audited by ConsenSys Diligence; the audit report is available [here](https://github.com/ConsenSys/ens-audit-report-2019-02).
-
-### BaseRegistrar
-
-BaseRegistrar is the contract that owns the TLD in the ENS registry. This contract implements a minimal set of functionality:
-
-- The owner of the registrar may add and remove controllers.
-- Controllers may register new domains and extend the expiry of (renew) existing domains. They can not change the ownership or reduce the expiration time of existing domains.
-- Name owners may transfer ownership to another address.
-- Name owners may reclaim ownership in the ENS registry if they have lost it.
-- Owners of names in the interim registrar may transfer them to the new registrar, during the 1 year transition period. When they do so, their deposit is returned to them in its entirety.
-
-This separation of concerns provides name owners strong guarantees over continued ownership of their existing names, while still permitting innovation and change in the way names are registered and renewed via the controller mechanism.
-
-### EthRegistrarController
-
-EthRegistrarController is the first implementation of a registration controller for the new registrar. This contract implements the following functionality:
-
-- The owner of the registrar may set a price oracle contract, which determines the cost of registrations and renewals based on the name and the desired registration or renewal duration.
-- The owner of the registrar may withdraw any collected funds to their account.
-- Users can register new names using a commit/reveal process and by paying the appropriate registration fee.
-- Users can renew a name by paying the appropriate fee. Any user may renew a domain, not just the name's owner.
-
-The commit/reveal process is used to avoid frontrunning, and operates as follows:
-
-1.  A user commits to a hash, the preimage of which contains the name to be registered and a secret value.
-2.  After a minimum delay period and before the commitment expires, the user calls the register function with the name to register and the secret value from the commitment. If a valid commitment is found and the other preconditions are met, the name is registered.
-
-The minimum delay and expiry for commitments exist to prevent miners or other users from effectively frontrunning registrations.
-
-### SimplePriceOracle
-
-SimplePriceOracle is a trivial implementation of the pricing oracle for the EthRegistrarController that always returns a fixed price per domain per year, determined by the contract owner.
-
-### StablePriceOracle
-
-StablePriceOracle is a price oracle implementation that allows the contract owner to specify pricing based on the length of a name, and uses a fiat currency oracle to set a fixed price in fiat per name.
-
-## Resolvers
-
-Resolver implements a general-purpose ENS resolver that is suitable for most standard ENS use cases. The public resolver permits updates to ENS records by the owner of the corresponding name.
-
-PublicResolver includes the following profiles that implements different EIPs.
-
-- ABIResolver = EIP 205 - ABI support (`ABI()`).
-- AddrResolver = EIP 137 - Contract address interface. EIP 2304 - Multicoin support (`addr()`).
-- ContentHashResolver = EIP 1577 - Content hash support (`contenthash()`).
-- InterfaceResolver = EIP 165 - Interface Detection (`supportsInterface()`).
-- NameResolver = EIP 181 - Reverse resolution (`name()`).
-- PubkeyResolver = EIP 619 - SECP256k1 public keys (`pubkey()`).
-- TextResolver = EIP 634 - Text records (`text()`).
-- DNSResolver = Experimental support is available for hosting DNS domains on the Ethereum blockchain via ENS. [The more detail](https://veox-ens.readthedocs.io/en/latest/dns.html) is on the old ENS doc.
-
-## Developer guide
-
-### Prettier pre-commit hook
-
-This repo runs a husky precommit to prettify all contract files to keep them consistent. Add new folder/files to `prettier format` script in package.json. If you need to add other tasks to the pre-commit script, add them to `.husky/pre-commit`
-
-### How to setup
-
-```
-git clone https://github.com/ensdomains/ens-contracts
-cd ens-contracts
-bun i
-```
-
-### How to run tests
-
-```
-bun run test
-```
-
-### How to publish
-
-```
-bun run pub
-```
-
-## L2 contracts
-
-The only contract in this repo deployed on L2s is `L2ReverseRegistrar` (and its dependency `UniversalSigValidator`).
-
-Anyone can deploy this contract onto any L2, however the contract has functionality which allows using one signature across multiple L2s.
-Given this functionality, and [EIP-191](https://eips.ethereum.org/EIPS/eip-191)'s requirement for the intended validator address in the signature, the contract address needs to stay the same between all networks.
-
-To allow for a unified contract address, a Safe and a helper CREATE3 contract are used in the deployment process. The contract can be deployed outside the process, but it means that it will lack the multi-chain signature functionality.
-
-Testnet Safe address: `0x343431e9CEb7C19cC8d3eA0EE231bfF82B584910`
-Mainnet Safe address: `0x353530FE74098903728Ddb66Ecdb70f52e568eC1`
-
-## Release flow
-
-### Deployment
-
-When readying a new deployment of certain contracts, bump the deploy script version number to the appropriate new version. Doing this ensures that the new deployment script will run for each network.
-
-Deployment scripts can be run for any specified network found in the [config](hardhat.config.ts#L38), with the following:
-
-```
-bun hh --network <network_name> deploy
-```
-
-Only scripts that haven't been run on the specified network before will be run.
-
-### Deployment testing
-
-To test deploying contracts and the functionality of them after deployment, there are two basic paths for forking:
-
-- Run an anvil fork, useful for testing locally and iterating. (`anvil --fork-url <url>`)
-- Use a Tenderly Virtual TestNet, useful as a staging environment.
-
-When **access to the owner account is available** (testnet only - owner on mainnet is the DAO), you can deploy straight to the fork by replacing the forked network's URL in the hardhat config with your RPC:
-
-```typescript
-const config = {
-  // ... existing config
-  networks: {
-    targetNetwork: {
-      // ... other network config
-      url: 'tenderly-or-anvil-url-here',
-    },
-  },
-}
-```
-
-Without access to the owner account, you can deploy via the impersonation script, which makes impersonated accounts from an external node available to hardhat.
+### Setup
 
 ```bash
-./scripts/deploy-with-impersonation.ts --rpc-url <url> --accounts <addr1> [addr2 ...] [--tags <tags>]
-
-# Testnet usage
-./scripts/deploy-with-impersonation.ts --rpc-url <url> --accounts 0x0F32b753aFc8ABad9Ca6fE589F707755f4df2353
-
-# Mainnet usage
-./scripts/deploy-with-impersonation.ts --rpc-url <url> --accounts 0xFe89cc7aBB2C4183683ab71653C4cdc9B02D44b7
+git clone https://github.com/ecnsdomains/ecns-contracts
+cd ecns-contracts
+pnpm install
 ```
 
-### Release flow
+### Compile
 
-1. Create a `feature` branch from `staging` branch
-2. Make code updates
-3. Ensure you are synced up with `staging`
-4. Code should now be in a state where you think it can be deployed to production
-5. Create a "Release Candidate" [release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) on GitHub. This will be of the form `v1.2.3-RC0`. This tagged commit is now subject to our bug bounty.
-6. Have the tagged commit audited if necessary
-7. If changes are required, make the changes and then once ready for review create another GitHub release with an incremented RC value `v1.2.3-RC0` -> `v.1.2.3-RC1`. Repeat as necessary.
-8. Deploy to testnet. Open a pull request to merge the deploy artifacts into
-   the `feature` branch. Create GitHub release of the form `v1.2.3-testnet` from the commit that has the new deployment artifacts.
-9. Get someone to review and approve the deployment and then merge. You now MUST merge this branch into `staging` branch.
-10. If any further changes are needed, you can either make them on the existing feature branch that is in sync or create a new branch, and follow steps 1 -> 9. Repeat as necessary.
-11. Make a deployment to ethereum mainnet from `staging`. Create a GitHub release of the form `v1.2.3` from the commit that has the new deployment artifacts.
-12. Open a PR to merge into `main`. Have it reviewed and merged.
+```bash
+pnpm compile
+# or
+npx hardhat compile
+```
 
-### Cherry-picked release flow
+### Test
 
-Certain changes can be released in isolation via cherry-picking, although ideally we would always release from `staging`.
+```bash
+pnpm test
+```
 
-1. Create a new branch from `mainnet`.
-2. Cherry-pick from `staging` into new branch.
-3. Deploy to ethereum mainnet, tag the commit that has deployment artifacts and create a release.
-4. Merge into `mainnet`.
+### Deploy to Mordor
 
-### Emergency release process
+```bash
+cp .env.example .env
+# Edit .env with your deployer key and RPC URLs
 
-1. Branch from `main`, make fixes, deploy to testnet (can skip), deploy to mainnet
-2. Merge changes back into `main` and `staging` immediately after deploy
-3. Create GitHub releases, if you didn't deploy to testnet in step 1, do it now
+# Full deployment (first time)
+source .env && export DEPLOYER_KEY && npx tsx scripts/deploy-full.ts
 
-### Notes
+# Deploy/update dictionary + renderer
+source .env && export DEPLOYER_KEY && npx tsx scripts/populate-dictionary.ts
 
-- Deployed code should always match source code in mainnet releases. This may not be the case for `staging`.
-- `staging` branch and `main` branch should start in sync
-- `staging` is intended to be a practice `main`. Only code that is intended to be released to `main` can be merged to `staging`. Consequently:
-  - Feature branches will be long-lived
-  - Feature branches must be kept in sync with `staging`
-  - Audits are conducted on feature branches
-- All code that is on `staging` and `main` should be deployed to testnet and mainnet respectively i.e. these branches should not have any undeployed code
-- It is preferable to not edit the same file on different feature branches.
-- Code on `staging` and `main` will always be a subset of what is deployed, as smart contracts cannot be undeployed.
-- Release candidates, `staging` and `main` branch are subject to our bug bounty
-- Releases follow semantic versioning and releases should contain a description of changes with developers being the intended audience
+# Reserve offensive names
+source .env && export DEPLOYER_KEY && npx tsx scripts/reserve-names.ts
+```
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `deploy-full.ts` | Full contract deployment to any network |
+| `deploy-mordor-full.ts` | Mordor-specific full deployment |
+| `populate-dictionary.ts` | Deploy dictionary + renderer, populate word lists |
+| `reserve-names.ts` | Reserve names from `config/reserved-names.json` |
+| `upgrade-renderer.ts` | Hot-swap metadata renderer on BaseRegistrar |
+| `test-dictionary.ts` | Test dictionary-based leetspeak on deployed contracts |
+| `test-traits.ts` | Register names and verify trait system |
+| `test-registration.ts` | Test commit-reveal registration flow |
+
+### Configuration
+
+| File | Purpose |
+|------|---------|
+| `config/dictionary-words.json` | Word lists for ECNSWordDictionary (3,916 words, 75 iconic, 402 blacklist) |
+| `config/reserved-names.json` | Reserved names across 12 categories (1,876 offensive + leet variants) |
+| `deployments/mordor.json` | Mordor contract addresses and configuration |
+
+### Prototype
+
+Open `svg-prototype/v3-card.html` in a browser to preview NFT card designs with the trait system. Includes dictionary-based leetspeak detection mirroring the on-chain logic.
+
+## Networks
+
+| Network | Chain ID | RPC |
+|---------|----------|-----|
+| ETC Mainnet | 61 | `https://etc.rivet.cloud` |
+| Mordor Testnet | 63 | `https://rpc.mordor.etccooperative.org` |
+
+## License
+
+MIT - see [LICENSE.txt](LICENSE.txt)
+
+## Upstream
+
+Forked from [ensdomains/ens-contracts](https://github.com/ensdomains/ens-contracts). The `main` branch tracks upstream; the `etc` branch contains all ECNS modifications.

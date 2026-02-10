@@ -85,6 +85,28 @@ const config = {
           },
         },
       },
+      'contracts/nft/ECNSMetadataRenderer.sol': {
+        version: '0.8.26',
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          evmVersion: 'paris',
+        },
+      },
+      'contracts/nft/ECNSSVG.sol': {
+        version: '0.8.26',
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          evmVersion: 'paris',
+        },
+      },
     },
     npmFilesToBuild: [
       '@openzeppelin/contracts/utils/introspection/ERC165.sol',

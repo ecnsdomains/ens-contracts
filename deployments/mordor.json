@@ -2,15 +2,75 @@
   "chainId": 63,
   "network": "mordor",
   "deployer": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537",
+  "deployedAt": "2026-02-08T11:59:25.851Z",
   "contracts": {
-    "ECNSRegistry": "0xd8bb6e11d674ce8822a2bfff7f0510ab51e50ef8",
-    "ReverseRegistrar": "0x8527c6f200f772e50a80bf8baf1003e8ca60db0e"
+    "ECNSRegistry": "0x29dd3a41973ec0551bcd195e46e8eb9801621c34",
+    "ReverseRegistrar": "0x0ebc22b513866796157a9fc9e86d23c3cddc28ab",
+    "DefaultReverseRegistrar": "0xbf8ae6e839dfa16bb7cf47460b98f7390949880a",
+    "ECNSMetadataRenderer": "0xb82b372b7a368a3f3c1ff9ba96128650f629194b",
+    "BaseRegistrar": "0xfbce90395535d6ae9448f55d676bde9a40215a37",
+    "ETCswapFullOracle": "0x34bda98deb5862a7f387a60a1e3b01879eb5f3fe",
+    "ExponentialPremiumPriceOracle": "0xae4cdb10b803849766a2b695bca1a7df5a962b06",
+    "ETCRegistrarController": "0x6d36c84926c2637448f2a7eabad3a0eed7f95b25",
+    "PublicResolver": "0xc1267bafafd08fe85580985b020b2df08d863ca4",
+    "ECNSWordDictionary": "0xbbaf428472bbb7800c5bd255832a9858cead15fd"
   },
   "tld": {
     "name": "etc",
     "labelHash": "0x997997d543f68c7b77e62a13efc6e546bd2a81c2aa8769c3354422ebbbb4fba4",
-    "node": "0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9",
-    "owner": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537"
+    "node": "0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9"
   },
-  "blockExplorer": "https://etc.blockscout.com/mordor"
+  "blockExplorer": "https://etc-mordor.blockscout.com",
+  "reverse": {
+    "node": "0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34",
+    "addrReverseNode": "0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2"
+  },
+  "pricing": {
+    "oracle": "ETCswapFullOracle",
+    "priceOracle": "ExponentialPremiumPriceOracle",
+    "sources": [
+      "V2",
+      "V3",
+      "V4 (pending Olympia)"
+    ],
+    "rentPrices": {
+      "1char": "$640/year",
+      "2char": "$160/year",
+      "3char": "$640/year",
+      "4char": "$160/year",
+      "5+char": "$5/year"
+    },
+    "premium": {
+      "type": "ExponentialDecay",
+      "startPremium": "$100,000,000",
+      "decayPeriod": "21 days",
+      "gracePeriod": "90 days"
+    }
+  },
+  "oracle": {
+    "type": "ETCswapFull",
+    "v2": {
+      "pair": "0x0a73dc518791Fa8436939C8a8a08003EC782A509",
+      "wetcIsToken0": true
+    },
+    "v3": {
+      "pool": "0x7E4ABAeF2b18F05B8eB406CF76C23f517bEb3e13",
+      "wetcIsToken0": true,
+      "feeTier": 500
+    },
+    "v4": {
+      "enabled": false,
+      "note": "Configure after Olympia via configureV4()"
+    }
+  },
+  "features": {
+    "reservedNames": true,
+    "exponentialPremium": true,
+    "realTimeOracle": true
+  },
+  "ownership": {
+    "owner": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537",
+    "deployer": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537",
+    "mode": "development"
+  }
 }

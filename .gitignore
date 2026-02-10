@@ -4,9 +4,12 @@ cache
 gasreport-*
 generated
 .env
+.env.*
+!.env.example
 *.DS_Store
 build
 forge-cache
 out
 deployments/**/.pendingSafeTransactions
 deployments/localhost
+svg-prototype/test-output-*.svg

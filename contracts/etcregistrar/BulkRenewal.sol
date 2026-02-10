@@ -11,8 +11,8 @@ import "./IPriceOracle.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 contract BulkRenewal is IBulkRenewal {
-    bytes32 private constant ETH_NAMEHASH =
-        0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
+    bytes32 private constant ETC_NAMEHASH =
+        0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9;
 
     ECNS public immutable ecns;
 
@@ -21,11 +21,11 @@ contract BulkRenewal is IBulkRenewal {
     }
 
     function getController() internal view returns (ETCRegistrarController) {
-        Resolver r = Resolver(ecns.resolver(ETH_NAMEHASH));
+        Resolver r = Resolver(ecns.resolver(ETC_NAMEHASH));
         return
             ETCRegistrarController(
                 r.interfaceImplementer(
-                    ETH_NAMEHASH,
+                    ETC_NAMEHASH,
                     type(IETCRegistrarController).interfaceId
                 )
             );

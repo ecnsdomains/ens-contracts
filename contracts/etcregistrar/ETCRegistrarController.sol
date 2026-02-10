@@ -32,9 +32,9 @@ contract ETCRegistrarController is
     /// @notice The minimum duration for a registration.
     uint256 public constant MIN_REGISTRATION_DURATION = 28 days;
 
-    // @notice The node (i.e. namehash) for the eth TLD.
-    bytes32 private constant ETH_NODE =
-        0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
+    // @notice The node (i.e. namehash) for the .etc TLD.
+    bytes32 private constant ETC_NODE =
+        0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9;
 
     /// @notice The maximum expiry time for a registration.
     uint64 private constant MAX_EXPIRY = type(uint64).max;
@@ -63,6 +63,9 @@ contract ETCRegistrarController is
     /// @notice A mapping of commitments to their timestamp.
     mapping(bytes32 => uint256) public commitments;
 
+    /// @notice A mapping of reserved label hashes that cannot be registered.
+    mapping(bytes32 => bool) public reservedNames;
+
     /// @notice Thrown when a commitment is not found.
     error CommitmentNotFound(bytes32 commitment);
 
@@ -82,6 +85,9 @@ contract ETCRegistrarController is
 
     /// @notice Thrown when a name is not available to register.
     error NameNotAvailable(string name);
+
+    /// @notice Thrown when a name is reserved and cannot be registered.
+    error NameReserved(string name);
 
     /// @notice Thrown when the duration supplied for a registration is too short.
     error DurationTooShort(uint256 duration);
@@ -137,6 +143,16 @@ contract ETCRegistrarController is
         uint256 expires,
         bytes32 referrer
     );
+
+    /// @notice Emitted when a name is reserved.
+    ///
+    /// @param labelhash The keccak256 hash of the label.
+    event NameReservedEvent(bytes32 indexed labelhash);
+
+    /// @notice Emitted when a name is unreserved.
+    ///
+    /// @param labelhash The keccak256 hash of the label.
+    event NameUnreserved(bytes32 indexed labelhash);
 
     /// @notice Constructor for the ETCRegistrarController.
     ///
@@ -285,19 +301,21 @@ contract ETCRegistrarController is
         uint256 expires;
 
         if (registration.resolver == address(0)) {
-            expires = base.register(
+            expires = base.registerWithLabel(
                 uint256(labelhash),
                 registration.owner,
-                registration.duration
+                registration.duration,
+                registration.label
             );
         } else {
-            expires = base.register(
+            expires = base.registerWithLabel(
                 uint256(labelhash),
                 address(this),
-                registration.duration
+                registration.duration,
+                registration.label
             );
 
-            bytes32 namehash = keccak256(abi.encodePacked(ETH_NODE, labelhash));
+            bytes32 namehash = keccak256(abi.encodePacked(ETC_NODE, labelhash));
             ecns.setRecord(
                 namehash,
                 registration.owner,
@@ -376,6 +394,44 @@ contract ETCRegistrarController is
         payable(owner()).transfer(address(this).balance);
     }
 
+    /// @notice Reserves a name so it cannot be registered.
+    ///
+    /// @param label The label to reserve.
+    function reserveName(string calldata label) external onlyOwner {
+        bytes32 labelhash = keccak256(bytes(label));
+        reservedNames[labelhash] = true;
+        emit NameReservedEvent(labelhash);
+    }
+
+    /// @notice Reserves multiple names at once.
+    ///
+    /// @param labels The labels to reserve.
+    function reserveNames(string[] calldata labels) external onlyOwner {
+        for (uint256 i = 0; i < labels.length; i++) {
+            bytes32 labelhash = keccak256(bytes(labels[i]));
+            reservedNames[labelhash] = true;
+            emit NameReservedEvent(labelhash);
+        }
+    }
+
+    /// @notice Unreserves a name so it can be registered.
+    ///
+    /// @param label The label to unreserve.
+    function unreserveName(string calldata label) external onlyOwner {
+        bytes32 labelhash = keccak256(bytes(label));
+        reservedNames[labelhash] = false;
+        emit NameUnreserved(labelhash);
+    }
+
+    /// @notice Returns true if a name is reserved.
+    ///
+    /// @param label The label to check.
+    /// @return True if the name is reserved, false otherwise.
+    function isReserved(string calldata label) public view returns (bool) {
+        bytes32 labelhash = keccak256(bytes(label));
+        return reservedNames[labelhash];
+    }
+
     /// @inheritdoc IERC165
     function supportsInterface(
         bytes4 interfaceID
@@ -403,6 +459,6 @@ contract ETCRegistrarController is
         string calldata label,
         bytes32 labelhash
     ) internal view returns (bool) {
-        return valid(label) && base.available(uint256(labelhash));
+        return valid(label) && !reservedNames[labelhash] && base.available(uint256(labelhash));
     }
 }

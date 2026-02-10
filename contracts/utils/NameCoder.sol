@@ -16,9 +16,9 @@ import {BytesUtils} from "./BytesUtils.sol";
 /// * `dns.length == 2 + ecns.length` and the mapping is injective.
 ///
 library NameCoder {
-    /// @dev The namehash of "eth".
-    bytes32 public constant ETH_NODE =
-        0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
+    /// @dev The namehash of "etc".
+    bytes32 public constant ETC_NODE =
+        0x2f142013fcc88d47bffe42e5d883f6081cbaa75abaa20e7f34f3043bbc8162c9;
 
     /// @dev The label was empty.
     ///      Error selector: `0xbf9a2740`
