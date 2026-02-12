@@ -13,3 +13,27 @@ out
 deployments/**/.pendingSafeTransactions
 deployments/localhost
 svg-prototype/test-output-*.svg
+# Claude internal files
+.claude/SESSION_NOTES.md
+.claude/reports/
+.claude/debug.log
+
+# Planning & internal docs
+SESSION_NOTES.md
+PLANNING.md
+SCRATCH.md
+*.scratch.*
+*.draft.*
+
+# Blockchain & crypto
+keystore/
+*.keystore
+wallet.json
+mnemonic.txt
+
+# IDE & OS
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+Thumbs.db
