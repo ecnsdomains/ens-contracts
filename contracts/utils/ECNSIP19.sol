@@ -42,7 +42,7 @@ library ECNSIP19 {
     ///      Reverts `EmptyAddress` if `addressBytes` is `0x`.
     /// @param addressBytes The input address.
     /// @param coinType The coin type.
-    /// @return The ENS reverse name, eg. `1234abcd.addr.reverse`.
+    /// @return The ECNS reverse name, eg. `1234abcd.addr.reverse`.
     function reverseName(
         bytes memory addressBytes,
         uint256 coinType

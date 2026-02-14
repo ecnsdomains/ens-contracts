@@ -20,7 +20,7 @@ import {IMulticallable} from "../resolvers/IMulticallable.sol";
 abstract contract ResolverCaller is CCIPBatcher {
     /// @dev `name` cannot be resolved.
     ///      Error selector: `0x5fe9a5df`
-    /// @param name The DNS-encoded ENS name.
+    /// @param name The DNS-encoded ECNS name.
     error UnreachableName(bytes name);
 
     /// @notice Perform forward resolution.
@@ -41,7 +41,7 @@ abstract contract ResolverCaller is CCIPBatcher {
 	///      The return type is necessary to define the result of the callback.
 	///      Call this function externally or with `ccipRead()` to intercept the response.
     /// @param resolver The resolver to call.
-    /// @param name The DNS-encoded ENS name.
+    /// @param name The DNS-encoded ECNS name.
     /// @param data The calldata for the resolution.
     /// @param hasContext True if `IExtendedDNSResolver` should be considered.
     /// @param context The context for `IExtendedDNSResolver`.

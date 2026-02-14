@@ -264,7 +264,7 @@ contract NameWrapper is
         // transfer the token from the user to this contract
         registrar.transferFrom(registrant, address(this), tokenId);
 
-        // transfer the ens record back to the new owner (this contract)
+        // transfer the registry record back to the new owner (this contract)
         registrar.reclaim(tokenId, address(this));
 
         expiry = uint64(registrar.nameExpires(tokenId)) + GRACE_PERIOD;
@@ -280,10 +280,10 @@ contract NameWrapper is
 
     /// @dev Registers a new .etc second-level domain and wraps it.
     ///      Only callable by authorised controllers.
-    /// @param label The label to register (Eg, 'foo' for 'foo.eth').
+    /// @param label The label to register (Eg, 'foo' for 'foo.etc').
     /// @param wrappedOwner The owner of the wrapped name.
     /// @param duration The duration, in seconds, to register the name for.
-    /// @param resolver The resolver address to set on the ENS registry (optional).
+    /// @param resolver The resolver address to set on the ECNS registry (optional).
     /// @param ownerControlledFuses Initial owner-controlled fuses to set
     /// @return registrarExpiry The expiry date of the new name on the .etc registrar, in seconds since the Unix epoch.
     function registerAndWrapETH2LD(
@@ -306,7 +306,7 @@ contract NameWrapper is
 
     /// @notice Renews a .etc second-level domain.
     /// @dev Only callable by authorised controllers.
-    /// @param tokenId The hash of the label to register (eg, `keccak256('foo')`, for 'foo.eth').
+    /// @param tokenId The hash of the label to register (eg, `keccak256('foo')`, for 'foo.etc').
     /// @param duration The number of seconds to renew the name for.
     /// @return expires The expiry date of the name on the .etc registrar, in seconds since the Unix epoch.
     function renew(
@@ -374,7 +374,7 @@ contract NameWrapper is
         _wrap(node, name, wrappedOwner, 0, 0);
     }
 
-    /// @notice Unwraps a .etc domain. e.g. vitalik.eth
+    /// @notice Unwraps a .etc domain. e.g. alice.etc
     /// @dev Can be called by the owner in the wrapper or an authorised caller in the wrapper
     /// @param labelhash Labelhash of the .etc domain
     /// @param registrant Sets the owner in the .etc registrar to this address
@@ -476,7 +476,7 @@ contract NameWrapper is
         return expiry;
     }
 
-    /// @notice Upgrades a domain of any kind. Could be a .eth name vitalik.eth, a DNSSEC name vitalik.xyz, or a subdomain
+    /// @notice Upgrades a domain of any kind. Could be a .etc name alice.etc, a DNSSEC name alice.xyz, or a subdomain
     /// @dev Can be called by the owner or an authorised caller
     /// @param name The name to upgrade, in DNS format
     /// @param extraData Extra data to pass to the upgrade contract
@@ -629,7 +629,7 @@ contract NameWrapper is
         }
     }
 
-    /// @notice Sets records for the name in the ENS Registry
+    /// @notice Sets records for the name in the ECNS Registry
     /// @param node Namehash of the name to set a record for
     /// @param owner New owner in the registry
     /// @param resolver Resolver contract
@@ -800,7 +800,7 @@ contract NameWrapper is
             revert LabelMismatch(labelhashFromData, labelhash);
         }
 
-        // transfer the ens record back to the new owner (this contract)
+        // transfer the registry record back to the new owner (this contract)
         registrar.reclaim(uint256(labelhash), address(this));
 
         uint64 expiry = uint64(registrar.nameExpires(tokenId)) + GRACE_PERIOD;
@@ -817,7 +817,7 @@ contract NameWrapper is
         uint32 fuses,
         uint64 expiry
     ) internal override {
-        // For this check, treat .eth 2LDs as expiring at the start of the grace period.
+        // For this check, treat .etc 2LDs as expiring at the start of the grace period.
         if (fuses & IS_DOT_ETH == IS_DOT_ETH) {
             expiry -= GRACE_PERIOD;
         }
@@ -981,7 +981,7 @@ contract NameWrapper is
         uint64 maxExpiry
     ) private pure returns (uint64) {
         // Expiry cannot be more than maximum allowed
-        // .eth names will check registrar, non .eth check parent
+        // .etc names will check registrar, non .etc check parent
         if (expiry > maxExpiry) {
             expiry = maxExpiry;
         }

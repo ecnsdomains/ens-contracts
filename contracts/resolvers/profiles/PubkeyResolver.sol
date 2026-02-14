@@ -12,8 +12,8 @@ abstract contract PubkeyResolver is IPubkeyResolver, ResolverBase {
 
     mapping(uint64 => mapping(bytes32 => PublicKey)) versionable_pubkeys;
 
-    /// Sets the SECP256k1 public key associated with an ENS node.
-    /// @param node The ENS node to query
+    /// Sets the SECP256k1 public key associated with an ECNS node.
+    /// @param node The ECNS node to query
     /// @param x the X coordinate of the curve point for the public key.
     /// @param y the Y coordinate of the curve point for the public key.
     function setPubkey(
@@ -25,9 +25,9 @@ abstract contract PubkeyResolver is IPubkeyResolver, ResolverBase {
         emit PubkeyChanged(node, x, y);
     }
 
-    /// Returns the SECP256k1 public key associated with an ENS node.
+    /// Returns the SECP256k1 public key associated with an ECNS node.
     /// Defined in EIP 619.
-    /// @param node The ENS node to query
+    /// @param node The ECNS node to query
     /// @return x The X coordinate of the curve point for the public key.
     /// @return y The Y coordinate of the curve point for the public key.
     function pubkey(

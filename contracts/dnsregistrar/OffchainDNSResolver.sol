@@ -100,7 +100,7 @@ contract OffchainDNSResolver is IExtendedResolver, IERC165 {
                 continue;
             }
 
-            // Look for a valid ENS-DNS TXT record
+            // Look for a valid ECNS-DNS TXT record
             (address dnsresolver, bytes memory context) = parseRR(
                 iter.data,
                 iter.rdataOffset,

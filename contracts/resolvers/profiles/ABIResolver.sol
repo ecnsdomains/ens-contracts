@@ -7,7 +7,7 @@ import "../ResolverBase.sol";
 abstract contract ABIResolver is IABIResolver, ResolverBase {
     mapping(uint64 => mapping(bytes32 => mapping(uint256 => bytes))) versionable_abis;
 
-    /// Sets the ABI associated with an ENS node.
+    /// Sets the ABI associated with an ECNS node.
     /// Nodes may have one ABI of each content type. To remove an ABI, set it to
     /// the empty string.
     /// @param node The node to update.
@@ -25,9 +25,9 @@ abstract contract ABIResolver is IABIResolver, ResolverBase {
         emit ABIChanged(node, contentType);
     }
 
-    /// Returns the ABI associated with an ENS node.
+    /// Returns the ABI associated with an ECNS node.
     /// Defined in EIP205.
-    /// @param node The ENS node to query
+    /// @param node The ECNS node to query
     /// @param contentTypes A bitwise OR of the ABI formats accepted by the caller.
     /// @return contentType The content type of the return value
     /// @return data The ABI data

@@ -9,8 +9,8 @@ interface ITextResolver {
         string value
     );
 
-    /// Returns the text data associated with an ENS node and key.
-    /// @param node The ENS node to query.
+    /// Returns the text data associated with an ECNS node and key.
+    /// @param node The ECNS node to query.
     /// @param key The text data key to query.
     /// @return The associated text data.
     function text(

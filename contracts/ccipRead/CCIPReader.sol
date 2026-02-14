@@ -18,7 +18,7 @@ import {EIP3668, OffchainLookup} from "./EIP3668.sol";
 import {BytesUtils} from "../utils/BytesUtils.sol";
 
 contract CCIPReader {
-    /// @dev Default unsafe call gas (sufficient for legacy ENS resolver profiles).
+    /// @dev Default unsafe call gas (sufficient for legacy ECNS resolver profiles).
     uint256 constant DEFAULT_UNSAFE_CALL_GAS = 50000;
 
     /// @dev Special-purpose value for identity callback: `f(x) = x`.

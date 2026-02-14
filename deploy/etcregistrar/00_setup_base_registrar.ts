@@ -1,5 +1,6 @@
 import { type artifacts, deployScript } from '@rocketh'
-import { labelhash } from 'viem'
+
+import { TLD, TLD_LABEL_HASH } from '../config'
 
 export default deployScript(
   async ({
@@ -28,11 +29,11 @@ export default deployScript(
       account: deployer,
     })
 
-    // 2. Set owner of eth node to registrar on root
-    console.log(`  - Setting owner of eth node to registrar on root`)
+    // 2. Set owner of TLD node to registrar on root
+    console.log(`  - Setting owner of .${TLD} node to registrar on root`)
     await write(root, {
       functionName: 'setSubnodeOwner',
-      args: [labelhash('eth'), registrar.address],
+      args: [TLD_LABEL_HASH, registrar.address],
       account: owner,
     })
   },

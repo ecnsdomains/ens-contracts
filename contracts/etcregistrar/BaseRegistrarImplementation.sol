@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
     // A map of expiry times
     mapping(uint256 => uint256) expiries;
-    // The ENS registry
+    // The ECNS registry
     ECNS public ecns;
     // The namehash of the TLD this registrar owns (eg, .etc)
     bytes32 public baseNode;
@@ -239,7 +239,7 @@ contract BaseRegistrarImplementation is ERC721, IBaseRegistrar, Ownable {
         return expiries[id];
     }
 
-    /// @dev Reclaim ownership of a name in ENS, if you own it in the registrar.
+    /// @dev Reclaim ownership of a name in ECNS, if you own it in the registrar.
     function reclaim(uint256 id, address owner) external override live {
         require(_isApprovedOrOwner(msg.sender, id));
         ecns.setSubnodeOwner(baseNode, bytes32(id), owner);

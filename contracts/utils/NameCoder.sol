@@ -6,7 +6,7 @@ import {BytesUtils} from "./BytesUtils.sol";
 
 /// @dev Library for encoding/decoding names.
 ///
-/// An ENS name is stop-separated labels, eg. "aaa.bb.c".
+/// An ECNS name is stop-separated labels, eg. "aaa.bb.c".
 ///
 /// A DNS-encoded name is composed of byte length-prefixed labels with a terminator byte.
 /// eg. "\x03aaa\x02bb\x01c\x00".
@@ -32,7 +32,7 @@ library NameCoder {
     ///      Error selector: `0xba4adc23`
     error DNSDecodingFailed(bytes dns);
 
-    /// @dev A label of the ENS name has an invalid size.
+    /// @dev A label of the name has an invalid size.
     ///      Error selector: `0x9a4c3e3b`
     error DNSEncodingFailed(string ens);
 
@@ -115,7 +115,7 @@ library NameCoder {
         }
     }
 
-    /// @dev Compute the ENS labelhash of the label at `offset` and the offset for the next label.
+    /// @dev Compute the labelhash of the label at `offset` and the offset for the next label.
     ///      Reverts `DNSDecodingFailed`.
     ///
     /// @param name The DNS-encoded name.
@@ -211,7 +211,7 @@ library NameCoder {
         }
     }
 
-    /// @dev Convert DNS-encoded name to ENS name.
+    /// @dev Convert DNS-encoded name to dot-separated name.
     ///      * `decode("\x00") = ""`
     ///      * `decode("\x03eth\x00") = "eth"`
     ///      * `decode("\x03aaa\x02bb\x01c\x00") = "aa.bb.c"`
@@ -220,7 +220,7 @@ library NameCoder {
     ///
     /// @param dns The DNS-encoded name to convert.
     ///
-    /// @return ens The equivalent ENS name.
+    /// @return ens The equivalent dot-separated name.
     function decode(
         bytes memory dns
     ) internal pure returns (string memory ens) {
@@ -246,13 +246,13 @@ library NameCoder {
         }
     }
 
-    /// @dev Convert ENS name to DNS-encoded name.
+    /// @dev Convert dot-separated name to DNS-encoded name.
     ///      * `encode("aaa.bb.c") = "\x03aaa\x02bb\x01c\x00"`
-    ///      * `encode("eth") = "\x03eth\x00"`
+    ///      * `encode("etc") = "\x03etc\x00"`
     ///      * `encode("") = "\x00"`
     ///      Reverts `DNSEncodingFailed`.
     ///
-    /// @param ens The ENS name to convert.
+    /// @param ens The dot-separated name to convert.
     ///
     /// @return dns The corresponding DNS-encoded name, eg. `\x03aaa\x02bb\x01c\x00`.
     function encode(
@@ -359,8 +359,8 @@ library NameCoder {
         return abi.encodePacked(assertLabelSize(label), label, name);
     }
 
-    /// @dev Transform `label` to DNS-encoded `{label}.eth`.
-    ///      * `etcName("eth") = "\x04test\x03eth\x00"`
+    /// @dev Transform `label` to DNS-encoded `{label}.etc`.
+    ///      * `etcName("test") = "\x04test\x03etc\x00"`
     ///      Behaves like `addLabel()`.
     ///
     /// @param label The label to encode.

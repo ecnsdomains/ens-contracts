@@ -12,7 +12,7 @@ contract TestRegistrar {
     mapping(bytes32 => uint256) public expiryTimes;
 
     /// Constructor.
-    /// @param ecnsAddr The address of the ENS registry.
+    /// @param ecnsAddr The address of the ECNS registry.
     /// @param node The node that this registrar administers.
     constructor(ECNS ecnsAddr, bytes32 node) {
         ecns = ecnsAddr;

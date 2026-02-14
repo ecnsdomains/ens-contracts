@@ -5,8 +5,8 @@ pragma solidity >=0.8.4;
 interface IAddrResolver {
     event AddrChanged(bytes32 indexed node, address a);
 
-    /// Returns the address associated with an ENS node.
-    /// @param node The ENS node to query.
+    /// Returns the address associated with an ECNS node.
+    /// @param node The ECNS node to query.
     /// @return The associated address.
     function addr(bytes32 node) external view returns (address payable);
 }

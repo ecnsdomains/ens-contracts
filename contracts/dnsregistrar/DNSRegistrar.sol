@@ -14,8 +14,8 @@ import "./DNSClaimChecker.sol";
 import "./PublicSuffixList.sol";
 import "./IDNSRegistrar.sol";
 
-/// @dev An ENS registrar that allows the owner of a DNS name to claim the
-///      corresponding name in ENS.
+/// @dev An ECNS registrar that allows the owner of a DNS name to claim the
+///      corresponding name in ECNS.
 contract DNSRegistrar is IDNSRegistrar, IERC165 {
     using BytesUtils for bytes;
     using Buffer for Buffer.buffer;
@@ -65,7 +65,7 @@ contract DNSRegistrar is IDNSRegistrar, IERC165 {
         ecns = _ecns;
     }
 
-    /// @dev This contract's owner-only functions can be invoked by the owner of the ENS root.
+    /// @dev This contract's owner-only functions can be invoked by the owner of the ECNS root.
     modifier onlyOwner() {
         Root root = Root(ecns.owner(bytes32(0)));
         address owner = root.owner();

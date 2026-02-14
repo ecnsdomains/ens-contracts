@@ -65,7 +65,7 @@ export default deployScript(
       return
     }
 
-    // Set interface on the resolver configured for .eth
+    // Set interface on the resolver configured for the primary TLD
     const ownedResolver =
       get<(typeof artifacts.OwnedResolver)['abi']>('OwnedResolver')
     console.log(

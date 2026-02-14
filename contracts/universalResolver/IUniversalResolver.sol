@@ -38,7 +38,7 @@ interface IUniversalResolver {
         bytes memory name
     ) external view returns (address resolver, bytes32 node, uint256 offset);
 
-    /// @notice Performs ENS name resolution for the supplied name and resolution data.
+    /// @notice Performs ECNS name resolution for the supplied name and resolution data.
     /// @notice Caller should enable EIP-3668.
     /// @param name The name to resolve, in normalised and DNS-encoded form.
     /// @param data The resolution data, as specified in ENSIP-10.
@@ -51,7 +51,7 @@ interface IUniversalResolver {
         bytes calldata data
     ) external view returns (bytes memory result, address resolver);
 
-    /// @notice Performs ENS reverse resolution for the supplied address and coin type.
+    /// @notice Performs ECNS reverse resolution for the supplied address and coin type.
     /// @notice Caller should enable EIP-3668.
     /// @param lookupAddress The address to reverse resolve, in encoded form.
     /// @param coinType The coin type to use for the reverse resolution.

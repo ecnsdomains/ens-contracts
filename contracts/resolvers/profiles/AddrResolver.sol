@@ -19,7 +19,7 @@ abstract contract AddrResolver is
     /// @dev Error selector: `0x8d666f60`
     error InvalidEVMAddress(bytes addressBytes);
 
-    /// @notice Set `addr(60)` of the associated ENS node.
+    /// @notice Set `addr(60)` of the associated ECNS node.
     ///         `address(0)` is stored as `new bytes(20)`.
     /// @param node The node to update.
     /// @param _addr The address to set.
@@ -30,7 +30,7 @@ abstract contract AddrResolver is
         setAddr(node, COIN_TYPE_ETH, abi.encodePacked(_addr));
     }
 
-    /// @notice Get `addr(60)` as `address` of the associated ENS node.
+    /// @notice Get `addr(60)` as `address` of the associated ECNS node.
     /// @param node The node to query.
     /// @return The associated address.
     function addr(
@@ -39,7 +39,7 @@ abstract contract AddrResolver is
         return payable(address(bytes20(addr(node, COIN_TYPE_ETH))));
     }
 
-    /// @notice Set the address for coin type of the associated ENS node.
+    /// @notice Set the address for coin type of the associated ECNS node.
     ///         Reverts `InvalidEVMAddress` if coin type is EVM and not 0 or 20 bytes.
     /// @param node The node to update.
     /// @param coinType The coin type.
@@ -65,7 +65,7 @@ abstract contract AddrResolver is
         ] = addressBytes;
     }
 
-    /// @notice Get the address for coin type of the associated ENS node.
+    /// @notice Get the address for coin type of the associated ECNS node.
     ///         If coin type is EVM and empty, defaults to `addr(COIN_TYPE_DEFAULT)`.
     /// @param node The node to query.
     /// @param coinType The coin type.

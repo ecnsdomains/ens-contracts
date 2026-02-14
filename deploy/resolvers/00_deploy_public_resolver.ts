@@ -1,5 +1,7 @@
 import { artifacts, deployScript } from '@rocketh'
-import { getAddress, namehash, type Address } from 'viem'
+import { getAddress, type Address } from 'viem'
+
+import { TLD, RESOLVER_NODE } from '../config'
 
 export default deployScript(
   async ({ deploy, get, execute: write, read, namedAccounts, network }) => {
@@ -50,28 +52,28 @@ export default deployScript(
       })
     }
 
-    const resolverEthOwner = await read(registry, {
+    const resolverNodeOwner = await read(registry, {
       functionName: 'owner',
-      args: [namehash('resolver.eth')],
+      args: [RESOLVER_NODE],
     })
 
-    if (resolverEthOwner === owner) {
-      console.log(`  - Setting resolver for resolver.eth to PublicResolver`)
+    if (resolverNodeOwner === owner) {
+      console.log(`  - Setting resolver for resolver.${TLD} to PublicResolver`)
       await write(registry, {
         functionName: 'setResolver',
-        args: [namehash('resolver.eth'), publicResolver.address],
+        args: [RESOLVER_NODE, publicResolver.address],
         account: owner,
       })
 
-      console.log(`  - Setting addr for resolver.eth to PublicResolver`)
+      console.log(`  - Setting addr for resolver.${TLD} to PublicResolver`)
       await write(publicResolver, {
         functionName: 'setAddr',
-        args: [namehash('resolver.eth'), publicResolver.address],
+        args: [RESOLVER_NODE, publicResolver.address],
         account: owner,
       })
     } else {
       console.warn(
-        `  - WARN: resolver.eth is not owned by the owner address, not setting resolver`,
+        `  - WARN: resolver.${TLD} is not owned by the owner address, not setting resolver`,
       )
     }
   },

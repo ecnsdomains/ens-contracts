@@ -7,7 +7,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /// @title RootSecurityController
-/// @notice Break-glass controller for ENS root operations.
+/// @notice Break-glass controller for ECNS root operations.
 /// @dev Ownable contract that can disable a TLD and clear its resolver in
 ///      emergencies.
 contract RootSecurityController is Ownable, ERC165 {
@@ -15,7 +15,7 @@ contract RootSecurityController is Ownable, ERC165 {
 
     /// @notice The root contract.
     Root public root;
-    /// @notice The ENS registry.
+    /// @notice The ECNS registry.
     ECNS public ecns;
 
     /// @param _root The root contract to manage.

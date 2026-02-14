@@ -10,7 +10,7 @@ pragma solidity ^0.8.4;
 import {BytesUtils} from "./BytesUtils.sol";
 
 library BytesUtils_LEGACY {
-    /// @dev Returns the ENS namehash of a DNS-encoded name.
+    /// @dev Returns the namehash of a DNS-encoded name.
     /// @param self The DNS-encoded name to hash.
     /// @param offset The offset at which to start hashing.
     /// @return The namehash of the name.

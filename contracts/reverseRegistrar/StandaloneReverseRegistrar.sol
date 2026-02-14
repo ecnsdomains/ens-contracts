@@ -7,7 +7,7 @@ import {ERC165} from "@openzeppelin/contracts-v5/utils/introspection/ERC165.sol"
 import {IStandaloneReverseRegistrar} from "./IStandaloneReverseRegistrar.sol";
 
 /// @title Standalone Reverse Registrar
-/// @notice A standalone reverse registrar, detached from the ENS registry.
+/// @notice A standalone reverse registrar, detached from the ECNS registry.
 contract StandaloneReverseRegistrar is ERC165, IStandaloneReverseRegistrar {
     /// @notice The mapping of addresses to names.
     mapping(address => string) internal _names;

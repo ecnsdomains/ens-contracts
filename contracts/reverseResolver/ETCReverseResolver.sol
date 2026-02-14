@@ -11,11 +11,11 @@ import {NameCoder} from "../utils/NameCoder.sol";
 import {HexUtils} from "../utils/HexUtils.sol";
 import {LibABI} from "../utils/LibABI.sol";
 
-/// @title Ethereum Reverse Resolver
+/// @title ETC Reverse Resolver
 /// @notice Reverses an EVM address using the first non-null response from the following sources:
 ///
 /// 1. `IStandaloneReverseRegistrar` for "addr.reverse"
-/// 2. `name()` from "{addr}.addr.reverse" in V1 Registry
+/// 2. `name()` from "{addr}.addr.reverse" via EIP-181 registry lookup
 /// 3. `IStandaloneReverseRegistrar` for "default.reverse"
 ///
 contract ETCReverseResolver is AbstractReverseResolver {
@@ -23,7 +23,7 @@ contract ETCReverseResolver is AbstractReverseResolver {
     bytes32 constant ADDR_REVERSE_NODE =
         0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
-    /// @notice The ENS registry contract.
+    /// @notice The ECNS registry contract.
     ECNS immutable ecns;
 
     /// @notice The reverse registrar contract for "default.reverse".

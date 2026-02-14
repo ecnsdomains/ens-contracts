@@ -30,7 +30,7 @@ contract PublicResolver is
 {
     ECNS immutable ecns;
     INameWrapper immutable nameWrapper;
-    address immutable trustedETHController;
+    address immutable trustedRegistrarController;
     address immutable trustedReverseRegistrar;
 
     /// A mapping of operators. An address that is authorised for an address
@@ -64,12 +64,12 @@ contract PublicResolver is
     constructor(
         ECNS _ecns,
         INameWrapper wrapperAddress,
-        address _trustedETHController,
+        address _trustedRegistrarController,
         address _trustedReverseRegistrar
     ) ReverseClaimer(_ecns, msg.sender) {
         ecns = _ecns;
         nameWrapper = wrapperAddress;
-        trustedETHController = _trustedETHController;
+        trustedRegistrarController = _trustedRegistrarController;
         trustedReverseRegistrar = _trustedReverseRegistrar;
     }
 
@@ -111,7 +111,7 @@ contract PublicResolver is
 
     function isAuthorised(bytes32 node) internal view override returns (bool) {
         if (
-            msg.sender == trustedETHController ||
+            msg.sender == trustedRegistrarController ||
             msg.sender == trustedReverseRegistrar
         ) {
             return true;

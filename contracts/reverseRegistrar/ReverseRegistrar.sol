@@ -57,20 +57,20 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
         emit DefaultResolverChanged(NameResolver(resolver));
     }
 
-    /// @dev Transfers ownership of the reverse ENS record associated with the
+    /// @dev Transfers ownership of the reverse ECNS record associated with the
     ///      calling account.
-    /// @param owner The address to set as the owner of the reverse record in ENS.
-    /// @return The ENS node hash of the reverse record.
+    /// @param owner The address to set as the owner of the reverse record in ECNS.
+    /// @return The ECNS node hash of the reverse record.
     function claim(address owner) public override returns (bytes32) {
         return claimForAddr(msg.sender, owner, address(defaultResolver));
     }
 
-    /// @dev Transfers ownership of the reverse ENS record associated with the
+    /// @dev Transfers ownership of the reverse ECNS record associated with the
     ///      calling account.
     /// @param addr The reverse record to set
-    /// @param owner The address to set as the owner of the reverse record in ENS.
+    /// @param owner The address to set as the owner of the reverse record in ECNS.
     /// @param resolver The resolver of the reverse node
-    /// @return The ENS node hash of the reverse record.
+    /// @return The ECNS node hash of the reverse record.
     function claimForAddr(
         address addr,
         address owner,
@@ -85,11 +85,11 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
         return reverseNode;
     }
 
-    /// @dev Transfers ownership of the reverse ENS record associated with the
+    /// @dev Transfers ownership of the reverse ECNS record associated with the
     ///      calling account.
-    /// @param owner The address to set as the owner of the reverse record in ENS.
+    /// @param owner The address to set as the owner of the reverse record in ECNS.
     /// @param resolver The address of the resolver to set; 0 to leave unchanged.
-    /// @return The ENS node hash of the reverse record.
+    /// @return The ECNS node hash of the reverse record.
     function claimWithResolver(
         address owner,
         address resolver
@@ -97,11 +97,11 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
         return claimForAddr(msg.sender, owner, resolver);
     }
 
-    /// @dev Sets the `name()` record for the reverse ENS record associated with
+    /// @dev Sets the `name()` record for the reverse ECNS record associated with
     /// the calling account. First updates the resolver to the default reverse
     /// resolver if necessary.
     /// @param name The name to set for this address.
-    /// @return The ENS node hash of the reverse record.
+    /// @return The ECNS node hash of the reverse record.
     function setName(string memory name) public override returns (bytes32) {
         return
             setNameForAddr(
@@ -112,14 +112,14 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
             );
     }
 
-    /// @dev Sets the `name()` record for the reverse ENS record associated with
+    /// @dev Sets the `name()` record for the reverse ECNS record associated with
     /// the account provided. Updates the resolver to a designated resolver
     /// Only callable by controllers and authorised users
     /// @param addr The reverse record to set
     /// @param owner The owner of the reverse node
     /// @param resolver The resolver of the reverse node
     /// @param name The name to set for this address.
-    /// @return The ENS node hash of the reverse record.
+    /// @return The ECNS node hash of the reverse record.
     function setNameForAddr(
         address addr,
         address owner,
@@ -133,7 +133,7 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
 
     /// @dev Returns the node hash for a given account's reverse records.
     /// @param addr The address to hash
-    /// @return The ENS node hash.
+    /// @return The ECNS node hash.
     function node(address addr) public pure override returns (bytes32) {
         return
             keccak256(
@@ -142,7 +142,7 @@ contract ReverseRegistrar is Ownable, Controllable, IReverseRegistrar {
     }
 
     /// @dev An optimised function to compute the sha3 of the lower-case
-    ///      hexadecimal representation of an Ethereum address.
+    ///      hexadecimal representation of an EVM address.
     /// @param addr The address to hash
     /// @return ret The SHA3 hash of the lower-case hexadecimal encoding of the
     ///         input address.

@@ -23,8 +23,8 @@ contract ETCRegistrarController is
 {
     using StringUtils for *;
 
-    /// @notice The bitmask for the Ethereum reverse record.
-    uint8 constant REVERSE_RECORD_ETHEREUM_BIT = 1;
+    /// @notice The bitmask for the chain-specific reverse record.
+    uint8 constant REVERSE_RECORD_BIT = 1;
 
     /// @notice The bitmask for the default reverse record.
     uint8 constant REVERSE_RECORD_DEFAULT_BIT = 2;
@@ -39,10 +39,10 @@ contract ETCRegistrarController is
     /// @notice The maximum expiry time for a registration.
     uint64 private constant MAX_EXPIRY = type(uint64).max;
 
-    /// @notice The ENS registry.
+    /// @notice The ECNS registry.
     ECNS public immutable ecns;
 
-    // @notice The base registrar implementation for the eth TLD.
+    // @notice The base registrar implementation for the primary TLD.
     BaseRegistrarImplementation immutable base;
 
     /// @notice The minimum time a commitment must exist to be valid.
@@ -57,7 +57,7 @@ contract ETCRegistrarController is
     /// @notice The registrar for default.reverse. (i.e. fallback reverse for all EVM chains)
     IDefaultReverseRegistrar public immutable defaultReverseRegistrar;
 
-    /// @notice The price oracle for the eth TLD.
+    /// @notice The price oracle for the primary TLD.
     IPriceOracle public immutable prices;
 
     /// @notice A mapping of commitments to their timestamp.
@@ -156,13 +156,13 @@ contract ETCRegistrarController is
 
     /// @notice Constructor for the ETCRegistrarController.
     ///
-    /// @param _base The base registrar implementation for the eth TLD.
-    /// @param _prices The price oracle for the eth TLD.
+    /// @param _base The base registrar implementation for the primary TLD.
+    /// @param _prices The price oracle for the primary TLD.
     /// @param _minCommitmentAge The minimum time a commitment must exist to be valid.
     /// @param _maxCommitmentAge The maximum time a commitment can exist to be valid.
     /// @param _reverseRegistrar The registrar for addr.reverse.
     /// @param _defaultReverseRegistrar The registrar for default.reverse.
-    /// @param _ecns The ENS registry.
+    /// @param _ecns The ECNS registry.
     constructor(
         BaseRegistrarImplementation _base,
         IPriceOracle _prices,
@@ -334,7 +334,7 @@ contract ETCRegistrarController is
                 uint256(labelhash)
             );
 
-            if (registration.reverseRecord & REVERSE_RECORD_ETHEREUM_BIT != 0)
+            if (registration.reverseRecord & REVERSE_RECORD_BIT != 0)
                 reverseRegistrar.setNameForAddr(
                     msg.sender,
                     msg.sender,

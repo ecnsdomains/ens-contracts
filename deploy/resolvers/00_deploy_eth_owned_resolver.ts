@@ -1,5 +1,7 @@
 import { artifacts, deployScript } from '@rocketh'
 
+import { TLD } from '../config'
+
 export default deployScript(
   async ({ deploy, get, execute: write, namedAccounts }) => {
     const { deployer, owner } = namedAccounts
@@ -26,7 +28,7 @@ export default deployScript(
       (typeof artifacts.BaseRegistrarImplementation)['abi']
     >('BaseRegistrarImplementation')
 
-    console.log(`  - Setting resolver for .eth to ${ethOwnedResolver.address}`)
+    console.log(`  - Setting resolver for .${TLD} to ${ethOwnedResolver.address}`)
     await write(registrar, {
       functionName: 'setResolver',
       args: [ethOwnedResolver.address],

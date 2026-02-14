@@ -7,8 +7,8 @@ import "./IContentHashResolver.sol";
 abstract contract ContentHashResolver is IContentHashResolver, ResolverBase {
     mapping(uint64 => mapping(bytes32 => bytes)) versionable_hashes;
 
-    /// Sets the contenthash associated with an ENS node.
-    /// May only be called by the owner of that node in the ENS registry.
+    /// Sets the contenthash associated with an ECNS node.
+    /// May only be called by the owner of that node in the ECNS registry.
     /// @param node The node to update.
     /// @param hash The contenthash to set
     function setContenthash(
@@ -19,8 +19,8 @@ abstract contract ContentHashResolver is IContentHashResolver, ResolverBase {
         emit ContenthashChanged(node, hash);
     }
 
-    /// Returns the contenthash associated with an ENS node.
-    /// @param node The ENS node to query.
+    /// Returns the contenthash associated with an ECNS node.
+    /// @param node The ECNS node to query.
     /// @return The associated contenthash.
     function contenthash(
         bytes32 node

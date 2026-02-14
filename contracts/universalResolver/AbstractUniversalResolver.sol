@@ -95,7 +95,7 @@ abstract contract AbstractUniversalResolver is
         return resolveWithGateways(name, data, batchGatewayProvider.gateways());
     }
 
-    /// @notice Performs ENS resolution process for the supplied name and resolution data.
+    /// @notice Performs ECNS resolution process for the supplied name and resolution data.
     ///         Caller should enable EIP-3668.
     /// @dev This function executes over multiple steps.
     /// @param name The name to resolve, in normalised and DNS-encoded form.
@@ -171,7 +171,7 @@ abstract contract AbstractUniversalResolver is
         address resolver; // valid reverse resolver
     }
 
-    /// @notice Performs ENS reverse resolution for the supplied address and coin type.
+    /// @notice Performs ECNS reverse resolution for the supplied address and coin type.
     ///         Caller should enable EIP-3668.
     /// @dev This function executes over multiple steps.
     /// @param lookupAddress The input address.
