@@ -4,17 +4,24 @@
   "deployer": "0x3b0952fB8eAAC74E56E176102eBA70BAB1C81537",
   "deployedAt": "2026-02-08T11:59:25.851Z",
   "contracts": {
-    "ECNSRegistry": "0x29dd3a41973ec0551bcd195e46e8eb9801621c34",
-    "ReverseRegistrar": "0x0ebc22b513866796157a9fc9e86d23c3cddc28ab",
-    "DefaultReverseRegistrar": "0xbf8ae6e839dfa16bb7cf47460b98f7390949880a",
+    "ECNSRegistry": "0x298195a795a5fe91bb47db1c4e501f07767775c8",
+    "ReverseRegistrar": "0xab9ffcf5ccaaf0f276a7c9813d57a8418e7e9f6a",
+    "DefaultReverseRegistrar": "0xe5230571856f9e4a15f5e9c4655b220b32a081b1",
+    "BaseRegistrar": "0x4d5e3a1e5dfbc98783ecbc91e6be2233fbf2978e",
+    "ETCswapFullOracle": "0x430198d8f9a854e90210d3df98294453f3a9b875",
+    "ExponentialPremiumPriceOracle": "0xf16140598170236cdbbc309b9357d5785c88c2e8",
+    "ETCRegistrarController": "0x13ff083bfd8377ea8e5a013e58662132cdb78ecb",
+    "PublicResolver": "0xf8ee21672f4077354091aa5b1a147fde25ae81bc",
     "ECNSMetadataRenderer": "0xb82b372b7a368a3f3c1ff9ba96128650f629194b",
-    "BaseRegistrar": "0xfbce90395535d6ae9448f55d676bde9a40215a37",
-    "ETCswapFullOracle": "0x34bda98deb5862a7f387a60a1e3b01879eb5f3fe",
-    "ExponentialPremiumPriceOracle": "0xae4cdb10b803849766a2b695bca1a7df5a962b06",
-    "ETCRegistrarController": "0x6d36c84926c2637448f2a7eabad3a0eed7f95b25",
-    "PublicResolver": "0xc1267bafafd08fe85580985b020b2df08d863ca4",
     "ECNSWordDictionary": "0xbbaf428472bbb7800c5bd255832a9858cead15fd"
   },
+  "notDeployed": [
+    "NameWrapper",
+    "UniversalResolver",
+    "BulkRenewal",
+    "DnsRegistrar",
+    "DnssecImpl"
+  ],
   "tld": {
     "name": "etc",
     "labelHash": "0x997997d543f68c7b77e62a13efc6e546bd2a81c2aa8769c3354422ebbbb4fba4",
