@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "./IECNSMetadataRenderer.sol";
 import "./IECNSWordDictionary.sol";
 import "./ECNSSVG.sol";
+import "./ECNSGrade.sol";
 
 /// @title ECNS Metadata Renderer
 /// @notice Generates fully on-chain SVG artwork and metadata for ECNS .etc name NFTs.
@@ -49,32 +50,43 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         uint8 glowColor   = uint8(uint16(bytes2(traits << 64)) % 7);
 
         // Name classification: detect leetspeak via dictionary
-        (string memory charClass, bytes memory decoded) = _classifyLabel(labelBytes);
+        (string memory charClass, bytes memory decoded, uint8 charClassId) = _classifyLabel(labelBytes);
         bool isLeet = decoded.length > 0;
         bool isIconic = isLeet && dictionary.isIconicLeet(label);
+        if (isIconic) charClassId = ECNSGrade.CLASS_ICONIC_LEET;
 
         // Tier: iconic leet → Ultra Rare, otherwise based on effective length
         uint256 effectiveLen = isLeet ? decoded.length : labelBytes.length;
         string memory tier = _tierName(effectiveLen, isIconic);
 
         // Fluency: analyze decoded word for leet, original for non-leet
-        string memory fluency = _analyzeFluency(isLeet ? decoded : labelBytes);
-
-        string memory pattern = _analyzePattern(labelBytes);
+        (string memory fluency, uint8 fluencyId) = _analyzeFluency(isLeet ? decoded : labelBytes);
+        (string memory pattern, uint8 patternId) = _analyzePattern(labelBytes);
         string memory chain = _chainName();
         string memory expiryDisplay = _expiryDisplay(expiry);
 
         // Sparkle for iconic leet, or short names (Legendary/Epic)
         bool isRare = isIconic || effectiveLen <= 4;
 
+        // Grade computation
+        bool isDictWord = !isLeet && labelBytes.length > 0 && dictionary.isWord(label);
+
+        (uint8 gradeWhole, bool gradeHalf, ECNSGrade.SubGrades memory subGrades, ) =
+            ECNSGrade.computeGrade(effectiveLen, charClassId, isDictWord, fluencyId, patternId);
+
+        string memory gradeStr = ECNSGrade.gradeToString(gradeWhole, gradeHalf);
+        uint8 gradeColor = ECNSGrade.gradeColorTier(gradeWhole, gradeHalf);
+
         string memory svg = _generateSVG(
             tokenId, name, labelBytes.length,
             borderStyle, textureIdx, glowColor, isRare,
-            tier, charClass, fluency, pattern, chain, expiryDisplay
+            tier, charClass, fluency, pattern, chain, expiryDisplay,
+            gradeStr, gradeColor
         );
 
         string memory attributes = _buildAttributes(
-            tier, labelBytes.length, charClass, fluency, pattern, chain, expiry
+            tier, labelBytes.length, charClass, fluency, pattern, chain, expiry,
+            gradeStr, subGrades
         );
 
         string memory json = string(abi.encodePacked(
@@ -108,7 +120,9 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         string memory fluency,
         string memory pattern,
         string memory chain,
-        string memory expiryDisplay
+        string memory expiryDisplay,
+        string memory grade,
+        uint8 gradeColorTier
     ) internal pure returns (string memory) {
         // Brand-constrained palette: dark backgrounds + green phosphor circles
         string memory color0 = _bgPalette(_getCircleCoord(tokenId, 136) % 5);
@@ -138,7 +152,9 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
             fluency: fluency,
             pattern: pattern,
             chain: chain,
-            expiryDisplay: expiryDisplay
+            expiryDisplay: expiryDisplay,
+            grade: grade,
+            gradeColorTier: gradeColorTier
         });
 
         return ECNSSVG.generateSVG(params);
@@ -195,10 +211,11 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
     // Name classification (Character Class + Leetspeak via dictionary)
     // =========================================================================
 
-    /// @dev Returns (charClass, decodedWord). If decodedWord.length > 0, name is Leetspeak.
+    /// @dev Returns (charClass, decodedWord, classId). If decodedWord.length > 0, name is Leetspeak.
     function _classifyLabel(bytes memory b) internal view returns (
         string memory charClass,
-        bytes memory decoded
+        bytes memory decoded,
+        uint8 classId
     ) {
         bool hasAlpha;
         bool hasDigit;
@@ -211,15 +228,16 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
             else if (c == 0x2D) hasHyphen = true;              // -
         }
 
-        if (hasHyphen) return ("Hyphenated", new bytes(0));
+        if (hasHyphen) return ("Hyphenated", new bytes(0), ECNSGrade.CLASS_HYPHENATED);
 
         if (hasDigit) {
             decoded = _tryLeetDecode(b);
-            if (decoded.length > 0) return ("Leetspeak", decoded);
-            return (hasAlpha ? "Alphanumeric" : "Numeric", new bytes(0));
+            if (decoded.length > 0) return ("Leetspeak", decoded, ECNSGrade.CLASS_DICT_LEET);
+            if (hasAlpha) return ("Alphanumeric", new bytes(0), ECNSGrade.CLASS_ALPHANUMERIC);
+            return ("Numeric", new bytes(0), ECNSGrade.CLASS_NUMERIC);
         }
 
-        return ("Pure Alpha", new bytes(0));
+        return ("Pure Alpha", new bytes(0), ECNSGrade.CLASS_PURE_ALPHA);
     }
 
     // =========================================================================
@@ -297,9 +315,9 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
     // Name analysis: Fluency
     // =========================================================================
 
-    function _analyzeFluency(bytes memory b) internal pure returns (string memory) {
+    function _analyzeFluency(bytes memory b) internal pure returns (string memory, uint8) {
         uint256 len = b.length;
-        if (len == 0) return "Standard";
+        if (len == 0) return ("Standard", ECNSGrade.FLUENCY_STANDARD);
 
         uint256 vowels;
         uint256 consonantRun;
@@ -319,10 +337,10 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
 
         uint256 ratio = (vowels * 100) / len;
 
-        if (ratio < 15 || ratio > 65 || clusters >= 2) return "Harsh";
-        if (ratio >= 35 && ratio <= 55 && clusters == 0) return "Euphonious";
-        if (ratio >= 25 && ratio <= 60 && clusters <= 1) return "Fluent";
-        return "Standard";
+        if (ratio < 15 || ratio > 65 || clusters >= 2) return ("Harsh", ECNSGrade.FLUENCY_HARSH);
+        if (ratio >= 35 && ratio <= 55 && clusters == 0) return ("Euphonious", ECNSGrade.FLUENCY_EUPHONIOUS);
+        if (ratio >= 25 && ratio <= 60 && clusters <= 1) return ("Fluent", ECNSGrade.FLUENCY_FLUENT);
+        return ("Standard", ECNSGrade.FLUENCY_STANDARD);
     }
 
     function _isVowel(bytes1 c) internal pure returns (bool) {
@@ -333,23 +351,23 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
     // Name analysis: Pattern
     // =========================================================================
 
-    function _analyzePattern(bytes memory b) internal pure returns (string memory) {
+    function _analyzePattern(bytes memory b) internal pure returns (string memory, uint8) {
         uint256 len = b.length;
-        if (len < 2) return "Standard";
+        if (len < 2) return ("Standard", ECNSGrade.PATTERN_STANDARD);
 
         // Palindrome
         bool isPalin = true;
         for (uint256 i = 0; i < len / 2; i++) {
             if (b[i] != b[len - 1 - i]) { isPalin = false; break; }
         }
-        if (isPalin) return "Palindrome";
+        if (isPalin) return ("Palindrome", ECNSGrade.PATTERN_PALINDROME);
 
         // Repeating (all same char)
         bool allSame = true;
         for (uint256 i = 1; i < len; i++) {
             if (b[i] != b[0]) { allSame = false; break; }
         }
-        if (allSame) return "Repeating";
+        if (allSame) return ("Repeating", ECNSGrade.PATTERN_REPEATING);
 
         // Repeating (2-char pattern: "abab")
         if (len >= 4) {
@@ -358,7 +376,7 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
             for (uint256 i = 0; i < len; i++) {
                 if (b[i] != b[i % half]) { isRepeat = false; break; }
             }
-            if (isRepeat) return "Repeating";
+            if (isRepeat) return ("Repeating", ECNSGrade.PATTERN_REPEATING);
         }
 
         // Sequential (abc, 123)
@@ -366,16 +384,16 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         for (uint256 i = 1; i < len; i++) {
             if (uint8(b[i]) != uint8(b[i - 1]) + 1) { isSeq = false; break; }
         }
-        if (isSeq) return "Sequential";
+        if (isSeq) return ("Sequential", ECNSGrade.PATTERN_SEQUENTIAL);
 
         // Reverse sequential (zyx, 987)
         bool isRevSeq = true;
         for (uint256 i = 1; i < len; i++) {
             if (uint8(b[i]) + 1 != uint8(b[i - 1])) { isRevSeq = false; break; }
         }
-        if (isRevSeq) return "Sequential";
+        if (isRevSeq) return ("Sequential", ECNSGrade.PATTERN_SEQUENTIAL);
 
-        return "Standard";
+        return ("Standard", ECNSGrade.PATTERN_STANDARD);
     }
 
     // =========================================================================
@@ -398,8 +416,8 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
     // =========================================================================
 
     function _chainName() internal view returns (string memory) {
-        if (block.chainid == 61) return "ETC";
-        if (block.chainid == 63) return "Mordor";
+        if (block.chainid == 61) return "Ethereum Classic";
+        if (block.chainid == 63) return "Mordor Testnet";
         return block.chainid.toString();
     }
 
@@ -425,26 +443,41 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         string memory fluency,
         string memory pattern,
         string memory chain,
-        uint256 expiry
+        uint256 expiry,
+        string memory grade,
+        ECNSGrade.SubGrades memory sub
     ) internal pure returns (string memory) {
         return string(abi.encodePacked(
+            '{"trait_type":"ECNS Grade","display_type":"number","value":', grade, '},',
             '{"trait_type":"Tier","value":"', tier, '"},',
             '{"trait_type":"Name Length","display_type":"number","value":', nameLen.toString(), '},',
             '{"trait_type":"Character Class","value":"', charClass, '"},',
             '{"trait_type":"Fluency","value":"', fluency, '"},',
-            _attributesTail(pattern, chain, expiry)
+            _attributesTail(pattern, chain, expiry, sub)
         ));
     }
 
     function _attributesTail(
         string memory pattern,
         string memory chain,
-        uint256 expiry
+        uint256 expiry,
+        ECNSGrade.SubGrades memory sub
     ) internal pure returns (string memory) {
         return string(abi.encodePacked(
             '{"trait_type":"Pattern","value":"', pattern, '"},',
-            '{"trait_type":"Chain","value":"', chain, '"},',
+            _numAttr("Scarcity", sub.scarcity), ',',
+            _numAttr("Composition", sub.composition), ',',
+            _numAttr("Resonance", sub.resonance), ',',
+            _numAttr("Structure", sub.structure), ',',
+            '{"trait_type":"Chain","value":"', chain,
+            '"},{"trait_type":"Provenance","value":"Direct"},',
             '{"display_type":"date","trait_type":"Registration Expires","value":', expiry.toString(), '}'
+        ));
+    }
+
+    function _numAttr(string memory name, uint8 val) internal pure returns (string memory) {
+        return string(abi.encodePacked(
+            '{"trait_type":"', name, '","display_type":"number","value":', uint256(val).toString(), '}'
         ));
     }
 }

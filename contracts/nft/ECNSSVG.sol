@@ -34,8 +34,10 @@ library ECNSSVG {
         string charClass;     // "Pure Alpha", "Leetspeak", "Alphanumeric", "Numeric", "Hyphenated"
         string fluency;       // "Euphonious", "Fluent", "Standard", "Harsh"
         string pattern;       // "Palindrome", "Repeating", "Sequential", "Standard"
-        string chain;         // "ETC" or "Mordor"
+        string chain;         // "Ethereum Classic" or "Mordor Testnet"
         string expiryDisplay; // "342d" or "Expired"
+        string grade;         // "7.5" or "10.0"
+        uint8 gradeColorTier; // 0-4 (badge background color)
     }
 
     // =========================================================================
@@ -51,6 +53,7 @@ library ECNSSVG {
             _generateCardMantle(params),
             _generateDataBadges(params),
             _generateCornerInfo(params),
+            _generateGradeBadge(params.grade, params.gradeColorTier),
             params.isRare ? _rareSparkleSvg() : "",
             '</svg>'
         ));
@@ -231,12 +234,12 @@ library ECNSSVG {
             '<text text-rendering="optimizeSpeed">'
             '<textPath startOffset="-100%" fill="#4FD4A4" font-family="', FONT, '" font-size="10px" xlink:href="#text-path-a">',
             name,
-            unicode' \u2022 Ethereum Classic Name Service',
+            unicode' \u2022 ethereum classic name service',
             ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite"/>'
             '</textPath>'
             '<textPath startOffset="0%" fill="#4FD4A4" font-family="', FONT, '" font-size="10px" xlink:href="#text-path-a">',
             name,
-            unicode' \u2022 Ethereum Classic Name Service',
+            unicode' \u2022 ethereum classic name service',
             ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite"/>'
             '</textPath>',
             _borderTextSecondHalf()
@@ -246,11 +249,11 @@ library ECNSSVG {
     function _borderTextSecondHalf() private pure returns (string memory) {
         return string(abi.encodePacked(
             '<textPath startOffset="50%" fill="#4FD4A4" font-family="', FONT, '" font-size="10px" xlink:href="#text-path-a">',
-            unicode'ECNS \u2022 .etc \u2022 On-Chain Identity',
+            unicode'ecns \u2022 .etc \u2022 on-chain identity',
             ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite"/>'
             '</textPath>'
             '<textPath startOffset="-50%" fill="#4FD4A4" font-family="', FONT, '" font-size="10px" xlink:href="#text-path-a">',
-            unicode'ECNS \u2022 .etc \u2022 On-Chain Identity',
+            unicode'ecns \u2022 .etc \u2022 on-chain identity',
             ' <animate additive="sum" attributeName="startOffset" from="0%" to="100%" begin="0s" dur="30s" repeatCount="indefinite"/>'
             '</textPath></text>'
         ));
@@ -268,7 +271,7 @@ library ECNSSVG {
             'px">',
             params.name,
             '</text>'
-            '<text y="270" x="250" text-anchor="middle" fill="#3FB68B" opacity=".5" font-family="', FONT, '" font-size="12px" font-weight="bold" letter-spacing="3">ECNS</text>'
+            '<text y="270" x="250" text-anchor="middle" fill="#3FB68B" opacity=".5" font-family="', FONT, '" font-size="12px" font-weight="bold" letter-spacing="3">ecns</text>'
         ));
     }
 
@@ -325,13 +328,38 @@ library ECNSSVG {
 
     function _generateCornerInfo(SVGParams memory params) private pure returns (string memory) {
         return string(abi.encodePacked(
-            '<text x="460" y="50" text-anchor="end" fill="rgba(63,182,139,0.4)" font-family="', FONT, '" font-size="10px">',
+            '<text x="460" y="90" text-anchor="end" fill="rgba(63,182,139,0.4)" font-family="', FONT, '" font-size="10px">',
             params.chain,
             '</text>'
             '<text x="470" y="478" text-anchor="end" fill="rgba(63,182,139,0.5)" font-family="', FONT, '" font-size="10px">',
             params.expiryDisplay,
             '</text>'
         ));
+    }
+
+    // =========================================================================
+    // Grade badge (top-right) — ecns graded certification
+    // =========================================================================
+
+    function _generateGradeBadge(string memory grade, uint8 colorTier) private pure returns (string memory) {
+        string memory badgeFill = _gradeBadgeColor(colorTier);
+        return string(abi.encodePacked(
+            '<g style="transform:translate(390px, 28px)">'
+            '<rect width="80px" height="52px" rx="8px" ry="8px" fill="', badgeFill, '"/>'
+            '<text x="40" y="34" text-anchor="middle" fill="#E8E8E8" font-family="', FONT,
+            '" font-size="22px" font-weight="bold">', grade, '</text>'
+            '<text x="40" y="46" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="', FONT,
+            '" font-size="7px" letter-spacing="1.5">ecns graded</text>'
+            '</g>'
+        ));
+    }
+
+    function _gradeBadgeColor(uint8 tier) private pure returns (string memory) {
+        if (tier == 0) return "rgba(94,224,178,0.85)";  // 9.0-10.0 Bright Phosphor
+        if (tier == 1) return "rgba(63,182,139,0.70)";  // 7.0-8.5  Primary Green
+        if (tier == 2) return "rgba(46,158,118,0.55)";  // 5.0-6.5  Mid Green
+        if (tier == 3) return "rgba(26,107,80,0.45)";   // 3.0-4.5  Deep Green
+        return "rgba(13,61,46,0.40)";                    // 1.0-2.5  Shadow
     }
 
     // =========================================================================
