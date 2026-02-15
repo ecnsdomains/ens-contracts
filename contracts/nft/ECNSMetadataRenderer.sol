@@ -110,11 +110,11 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         string memory chain,
         string memory expiryDisplay
     ) internal pure returns (string memory) {
-        uint256 paletteOffset = uint256(uint8(uint16(bytes2(bytes16(keccak256(abi.encodePacked(tokenId))))) % 7)) * 16;
-        string memory color0 = _tokenToColorHex(tokenId, 136 + paletteOffset);
-        string memory color1 = _tokenToColorHex(tokenId, 112 + paletteOffset);
-        string memory color2 = _tokenToColorHex(tokenId, 64 + paletteOffset);
-        string memory color3 = _tokenToColorHex(tokenId, paletteOffset);
+        // Brand-constrained palette: dark backgrounds + green phosphor circles
+        string memory color0 = _bgPalette(_getCircleCoord(tokenId, 136) % 5);
+        string memory color1 = _circlePalette(_getCircleCoord(tokenId, 112) % 12);
+        string memory color2 = _circlePalette(_getCircleCoord(tokenId, 64) % 12);
+        string memory color3 = _circlePalette(_getCircleCoord(tokenId, 32) % 12);
 
         ECNSSVG.SVGParams memory params = ECNSSVG.SVGParams({
             name: name,
@@ -123,11 +123,11 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
             color2: color2,
             color3: color3,
             x1: _scale(_getCircleCoord(tokenId, 16), 0, 255, 16, 484),
-            y1: _scale(_getCircleCoord(tokenId, 32), 0, 255, 16, 484),
-            x2: _scale(_getCircleCoord(tokenId, 48), 0, 255, 16, 484),
-            y2: _scale(_getCircleCoord(tokenId, 64), 0, 255, 16, 484),
-            x3: _scale(_getCircleCoord(tokenId, 80), 0, 255, 16, 484),
-            y3: _scale(_getCircleCoord(tokenId, 96), 0, 255, 16, 484),
+            y1: _scale(_getCircleCoord(tokenId, 48), 0, 255, 16, 484),
+            x2: _scale(_getCircleCoord(tokenId, 80), 0, 255, 16, 484),
+            y2: _scale(_getCircleCoord(tokenId, 96), 0, 255, 16, 484),
+            x3: _scale(_getCircleCoord(tokenId, 128), 0, 255, 16, 484),
+            y3: _scale(_getCircleCoord(tokenId, 160), 0, 255, 16, 484),
             nameLength: nameLen,
             borderStyle: borderStyle,
             glowColor: glowColor,
@@ -145,12 +145,37 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
     }
 
     // =========================================================================
-    // Color & coordinate helpers (adapted from V3's NFTDescriptor)
+    // Brand-constrained color palettes
     // =========================================================================
 
-    function _tokenToColorHex(uint256 tokenId, uint256 offset) internal pure returns (string memory) {
-        return _toHexStringNoPrefix(tokenId >> (offset % 256), 3);
+    /// @dev 5 dark green backgrounds — Terminal Black to Deep Forest
+    function _bgPalette(uint256 idx) internal pure returns (string memory) {
+        if (idx == 0) return "0F1A15"; // Terminal Black
+        if (idx == 1) return "0D3D2E"; // Shadow Green
+        if (idx == 2) return "1A2A22"; // Surface Dark
+        if (idx == 3) return "132F25"; // Dark Emerald
+        return "0B2E22";               // Deep Forest
     }
+
+    /// @dev 12 green phosphor shades for gradient circles
+    function _circlePalette(uint256 idx) internal pure returns (string memory) {
+        if (idx == 0) return "4FD4A4";  // Light Phosphor
+        if (idx == 1) return "3FB68B";  // Green Phosphor (Primary)
+        if (idx == 2) return "5EE0B2";  // Accent Hover
+        if (idx == 3) return "2E9E76";  // Mid Green
+        if (idx == 4) return "1A6B50";  // Deep Green
+        if (idx == 5) return "45BF96";  // Mint
+        if (idx == 6) return "3DD4A0";  // Neon Mint
+        if (idx == 7) return "2CCFB2";  // Teal
+        if (idx == 8) return "28A874";  // Classic Green
+        if (idx == 9) return "1B9E85";  // Cyan Green
+        if (idx == 10) return "0FA87A"; // Jade
+        return "189068";                // Emerald Dark
+    }
+
+    // =========================================================================
+    // Coordinate helpers
+    // =========================================================================
 
     function _getCircleCoord(uint256 tokenId, uint256 offset) internal pure returns (uint256) {
         return uint256(uint8(tokenId >> (offset % 256)));
@@ -164,15 +189,6 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         uint256 outMx
     ) internal pure returns (string memory) {
         return ((n - inMn) * (outMx - outMn) / (inMx - inMn) + outMn).toString();
-    }
-
-    function _toHexStringNoPrefix(uint256 value, uint256 length) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(2 * length);
-        for (uint256 i = buffer.length; i > 0; i--) {
-            buffer[i - 1] = ALPHABET[value & 0xf];
-            value >>= 4;
-        }
-        return string(buffer);
     }
 
     // =========================================================================

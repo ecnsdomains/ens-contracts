@@ -7,12 +7,12 @@
     "ECNSRegistry": "0x298195a795a5fe91bb47db1c4e501f07767775c8",
     "ReverseRegistrar": "0xab9ffcf5ccaaf0f276a7c9813d57a8418e7e9f6a",
     "DefaultReverseRegistrar": "0xe5230571856f9e4a15f5e9c4655b220b32a081b1",
-    "BaseRegistrar": "0x4d5e3a1e5dfbc98783ecbc91e6be2233fbf2978e",
+    "BaseRegistrar": "0xc54c25153a71722d8e8d3926f9c46141ff69bc3e",
     "ETCswapFullOracle": "0x430198d8f9a854e90210d3df98294453f3a9b875",
     "ExponentialPremiumPriceOracle": "0xf16140598170236cdbbc309b9357d5785c88c2e8",
-    "ETCRegistrarController": "0x13ff083bfd8377ea8e5a013e58662132cdb78ecb",
-    "PublicResolver": "0xf8ee21672f4077354091aa5b1a147fde25ae81bc",
-    "ECNSMetadataRenderer": "0xb82b372b7a368a3f3c1ff9ba96128650f629194b",
+    "ETCRegistrarController": "0x42aec3705297a3654e97a5cb42fc237225ce4e12",
+    "PublicResolver": "0xc2f7a01abe52dc8bf4f72eaa8879c3a708ec8a94",
+    "ECNSMetadataRenderer": "0x1c1f61165e65d0671a1972b61be4dfb0b1db4c99",
     "ECNSWordDictionary": "0xbbaf428472bbb7800c5bd255832a9858cead15fd"
   },
   "notDeployed": [

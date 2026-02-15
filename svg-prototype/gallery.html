@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ECNS NFT Gallery — Phase 3j Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #4FD4A4;
+      font-family: 'IBM Plex Mono', monospace;
+      padding: 40px;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; letter-spacing: 3px; }
+    .subtitle { color: rgba(63,182,139,0.5); font-size: 12px; margin-bottom: 40px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 32px;
+    }
+    .card {
+      background: #111;
+      border: 1px solid rgba(63,182,139,0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(63,182,139,0.4); }
+    .card object, .card img { width: 100%; display: block; }
+    .card-info {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-name { font-weight: 700; }
+    .card-meta { color: rgba(79,212,164,0.6); font-size: 11px; }
+  </style>
+</head>
+<body>
+  <h1>ECNS NFT PREVIEW</h1>
+  <p class="subtitle">Phase 3j — Terminal Phosphor Brand Identity • Mordor Testnet (Chain 63)</p>
+  <div class="grid">
+    <div class="card">
+      <object data="holographic.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">holographic.etc</span>
+        <span class="card-meta">Common • Pure Alpha</span>
+      </div>
+    </div>
+    <div class="card">
+      <object data="alice.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">alice.etc</span>
+        <span class="card-meta">Rare • Pure Alpha</span>
+      </div>
+    </div>
+    <div class="card">
+      <object data="h4ck3r.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">h4ck3r.etc</span>
+        <span class="card-meta">Ultra Rare • Leetspeak</span>
+      </div>
+    </div>
+    <div class="card">
+      <object data="bob.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">bob.etc</span>
+        <span class="card-meta">Legendary • Pure Alpha</span>
+      </div>
+    </div>
+    <div class="card">
+      <object data="0x42.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">0x42.etc</span>
+        <span class="card-meta">Epic • Alphanumeric</span>
+      </div>
+    </div>
+    <div class="card">
+      <object data="vitalik.svg" type="image/svg+xml"></object>
+      <div class="card-info">
+        <span class="card-name">vitalik.etc</span>
+        <span class="card-meta">Rare • Pure Alpha</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
