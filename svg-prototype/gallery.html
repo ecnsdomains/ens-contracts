@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ECNS NFT Gallery — Phase 3j Preview</title>
+  <title>ECNS NFT Gallery — Grade System + Mystery Box Preview</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,7 +12,18 @@
       padding: 40px;
     }
     h1 { font-size: 24px; margin-bottom: 8px; letter-spacing: 3px; }
+    h2 {
+      font-size: 18px;
+      margin: 48px 0 8px;
+      letter-spacing: 2px;
+      color: #3FB68B;
+      border-bottom: 1px solid rgba(63,182,139,0.15);
+      padding-bottom: 12px;
+    }
     .subtitle { color: rgba(63,182,139,0.5); font-size: 12px; margin-bottom: 40px; }
+    .section-desc { color: rgba(79,212,164,0.5); font-size: 11px; margin-bottom: 24px; line-height: 1.6; }
+
+    /* NFT Card Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -23,10 +34,10 @@
       border: 1px solid rgba(63,182,139,0.15);
       border-radius: 16px;
       overflow: hidden;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, transform 0.2s;
     }
-    .card:hover { border-color: rgba(63,182,139,0.4); }
-    .card object, .card img { width: 100%; display: block; }
+    .card:hover { border-color: rgba(63,182,139,0.4); transform: translateY(-2px); }
+    .card svg, .card object { width: 100%; display: block; }
     .card-info {
       padding: 16px;
       display: flex;
@@ -34,55 +45,774 @@
       align-items: center;
     }
     .card-name { font-weight: 700; }
-    .card-meta { color: rgba(79,212,164,0.6); font-size: 11px; }
+    .card-meta { color: rgba(79,212,164,0.6); font-size: 11px; text-align: right; }
+    .card-grade {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .grade-gem { background: rgba(94,224,178,0.85); color: #0a0a0a; }
+    .grade-high { background: rgba(63,182,139,0.70); color: #0a0a0a; }
+    .grade-mid { background: rgba(46,158,118,0.55); color: #E8E8E8; }
+    .grade-low { background: rgba(26,107,80,0.45); color: #E8E8E8; }
+    .grade-shadow { background: rgba(13,61,46,0.40); color: #E8E8E8; }
+    .provenance {
+      display: inline-block;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .prov-direct { background: rgba(63,182,139,0.15); color: rgba(79,212,164,0.7); }
+    .prov-mystery { background: rgba(94,224,178,0.25); color: #5EE0B2; }
+
+    /* Mystery Box Section */
+    .mystery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .mystery-box {
+      background: #111;
+      border: 1px solid rgba(63,182,139,0.2);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .mystery-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(63,182,139,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .mystery-box:hover { border-color: rgba(63,182,139,0.5); box-shadow: 0 0 30px rgba(63,182,139,0.08); }
+    .box-tier {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .box-price {
+      font-size: 32px;
+      font-weight: 700;
+      color: #E8E8E8;
+      margin: 12px 0 4px;
+    }
+    .box-price-unit { font-size: 12px; color: rgba(79,212,164,0.5); }
+    .box-desc {
+      color: rgba(79,212,164,0.5);
+      font-size: 10px;
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+    .box-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .box-stat {
+      background: rgba(13,61,46,0.4);
+      border-radius: 6px;
+      padding: 8px;
+    }
+    .box-stat-label { font-size: 8px; color: rgba(79,212,164,0.5); letter-spacing: 1px; text-transform: uppercase; }
+    .box-stat-value { font-size: 14px; color: #E8E8E8; margin-top: 2px; }
+    .box-cta {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 24px;
+      border: 1px solid rgba(63,182,139,0.4);
+      border-radius: 8px;
+      color: #4FD4A4;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: rgba(63,182,139,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .box-cta:hover { background: rgba(63,182,139,0.2); border-color: rgba(63,182,139,0.6); }
+    .tier-standard .box-tier { color: #2E9E76; }
+    .tier-premium .box-tier { color: #3FB68B; }
+    .tier-elite .box-tier { color: #5EE0B2; }
+    .tier-elite { border-color: rgba(94,224,178,0.3); }
+
+    /* Bulk Purchase Table */
+    .bulk-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 11px;
+    }
+    .bulk-table th {
+      text-align: left;
+      color: rgba(79,212,164,0.6);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(63,182,139,0.15);
+    }
+    .bulk-table td {
+      padding: 8px 12px;
+      color: #E8E8E8;
+      border-bottom: 1px solid rgba(63,182,139,0.06);
+    }
+    .bulk-table .discount { color: #5EE0B2; font-weight: 700; }
+
+    /* Mystery Box Card Preview (face-down) */
+    .mystery-card-preview {
+      width: 160px;
+      height: 160px;
+      margin: 16px auto;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .mystery-card-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0D3D2E, #132F25);
+      border: 1px solid rgba(63,182,139,0.25);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.6s;
+      position: relative;
+    }
+    .mystery-card-preview:hover .mystery-card-inner { transform: scale(1.03); }
+    .mystery-card-inner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.04) 1px, rgba(0,0,0,0.04) 2px);
+      pointer-events: none;
+    }
+    .mystery-diamond {
+      width: 40px;
+      height: 50px;
+      margin-bottom: 8px;
+      opacity: 0.6;
+    }
+    .mystery-qmark {
+      font-size: 28px;
+      font-weight: 200;
+      color: rgba(79,212,164,0.4);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    .mystery-label {
+      font-size: 8px;
+      color: rgba(63,182,139,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Reveal Animation Preview */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+      max-width: 600px;
+    }
+    .reveal-card {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      position: relative;
+      cursor: pointer;
+      perspective: 600px;
+    }
+    .reveal-card-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .reveal-card.flipped .reveal-card-inner { transform: rotateY(180deg); }
+    .reveal-front, .reveal-back {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .reveal-front {
+      background: linear-gradient(135deg, #0D3D2E, #132F25);
+      border: 1px solid rgba(63,182,139,0.25);
+    }
+    .reveal-front .mystery-qmark { font-size: 20px; }
+    .reveal-back {
+      transform: rotateY(180deg);
+      border: 1px solid rgba(63,182,139,0.3);
+      padding: 6px;
+    }
+    .reveal-name { font-size: 9px; color: #E8E8E8; font-weight: 700; margin-top: 4px; }
+    .reveal-grade { font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+    /* Grade Distribution Chart */
+    .grade-dist {
+      display: flex;
+      align-items: end;
+      gap: 4px;
+      height: 80px;
+      margin: 16px 0;
+    }
+    .grade-bar {
+      flex: 1;
+      background: rgba(63,182,139,0.3);
+      border-radius: 3px 3px 0 0;
+      position: relative;
+      transition: background 0.2s;
+      min-width: 20px;
+    }
+    .grade-bar:hover { background: rgba(63,182,139,0.5); }
+    .grade-bar-label {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      color: rgba(79,212,164,0.5);
+      white-space: nowrap;
+    }
+    .grade-bar-count {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      color: rgba(79,212,164,0.6);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(63,182,139,0.1);
+      color: rgba(63,182,139,0.3);
+      font-size: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>ECNS NFT PREVIEW</h1>
-  <p class="subtitle">Phase 3j — Terminal Phosphor Brand Identity • Mordor Testnet (Chain 63)</p>
-  <div class="grid">
-    <div class="card">
-      <object data="holographic.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">holographic.etc</span>
-        <span class="card-meta">Common • Pure Alpha</span>
+  <p class="subtitle">Phase 7 — ecns graded certification + mystery box • Mordor Testnet (Chain 63)</p>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: Graded NFT Cards -->
+  <!-- ============================================================ -->
+
+  <h2>ecns graded — name cards</h2>
+  <p class="section-desc">
+    every ecns name is certified with an eg (ecns grade) from 1.0 to 10.0.<br>
+    four sub-grades — scarcity, composition, resonance, structure — sum to a raw score mapped to half-point increments.<br>
+    the grade badge appears on every card. provenance tracks acquisition method: direct registration or mystery pull.
+  </p>
+
+  <div class="grid" id="nft-grid"></div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: Grade Distribution -->
+  <!-- ============================================================ -->
+
+  <h2>grade distribution</h2>
+  <p class="section-desc">
+    most names land 3.0–6.0. dictionary words push into 7.0+. short + euphonious + pattern = 9.0+.<br>
+    a 10.0 requires the trifecta: short + euphonious + palindrome + dictionary word.
+  </p>
+  <div class="grade-dist" id="grade-dist"></div>
+  <div style="height: 24px;"></div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: Mystery Box Tiers -->
+  <!-- ============================================================ -->
+
+  <h2>mystery box — pull random names</h2>
+  <p class="section-desc">
+    pay a steep discount, get a random name, discover its grade at reveal.<br>
+    most pulls are common (eg 3–5), but the chance of pulling a gem (eg 8+) creates excitement and repeat purchases.<br>
+    provenance: "mystery pull" — like "1st edition" on trading cards.
+  </p>
+
+  <div class="mystery-grid">
+    <!-- Standard -->
+    <div class="mystery-box tier-standard">
+      <div class="box-tier">standard</div>
+      <div class="mystery-card-preview">
+        <div class="mystery-card-inner">
+          <svg class="mystery-diamond" viewBox="0 0 80 100">
+            <polygon points="40,2 70,50 40,98 10,50" fill="#0D3D2E"/>
+            <polygon points="40,2 15,42 40,42" fill="#2E9E76" opacity="0.5"/>
+            <polygon points="15,42 10,50 40,50 40,42" fill="#2E9E76" opacity="0.4"/>
+            <polygon points="10,50 15,58 40,58 40,50" fill="#2E9E76" opacity="0.4"/>
+            <polygon points="15,58 40,98 40,58" fill="#2E9E76" opacity="0.5"/>
+            <polygon points="40,2 65,42 40,42" fill="#1A6B50" opacity="0.5"/>
+            <polygon points="65,42 70,50 40,50 40,42" fill="#0D3D2E" opacity="0.5"/>
+            <polygon points="70,50 65,58 40,58 40,50" fill="#1A6B50" opacity="0.5"/>
+            <polygon points="65,58 40,98 40,58" fill="#1A6B50" opacity="0.5"/>
+          </svg>
+          <span class="mystery-qmark">?</span>
+          <span class="mystery-label">standard</span>
+        </div>
       </div>
+      <div class="box-price">$2<span class="box-price-unit">/yr</span></div>
+      <div class="box-desc">
+        5–7 character random names<br>
+        90% alphanumeric, 10% phonetic alpha<br>
+        expected avg grade: 3.0–4.5
+      </div>
+      <div class="box-stats">
+        <div class="box-stat"><div class="box-stat-label">pool</div><div class="box-stat-value">10,000+</div></div>
+        <div class="box-stat"><div class="box-stat-label">vs direct</div><div class="box-stat-value">60% off</div></div>
+        <div class="box-stat"><div class="box-stat-label">gem odds</div><div class="box-stat-value">~2%</div></div>
+        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5/yr</div></div>
+      </div>
+      <button class="box-cta">pull standard</button>
     </div>
-    <div class="card">
-      <object data="alice.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">alice.etc</span>
-        <span class="card-meta">Rare • Pure Alpha</span>
+
+    <!-- Premium -->
+    <div class="mystery-box tier-premium">
+      <div class="box-tier">premium</div>
+      <div class="mystery-card-preview">
+        <div class="mystery-card-inner">
+          <svg class="mystery-diamond" viewBox="0 0 80 100">
+            <polygon points="40,2 70,50 40,98 10,50" fill="#0D3D2E"/>
+            <polygon points="40,2 15,42 40,42" fill="#3FB68B" opacity="0.6"/>
+            <polygon points="15,42 10,50 40,50 40,42" fill="#3FB68B" opacity="0.5"/>
+            <polygon points="10,50 15,58 40,58 40,50" fill="#3FB68B" opacity="0.5"/>
+            <polygon points="15,58 40,98 40,58" fill="#3FB68B" opacity="0.6"/>
+            <polygon points="40,2 65,42 40,42" fill="#1A6B50" opacity="0.6"/>
+            <polygon points="65,42 70,50 40,50 40,42" fill="#0D3D2E" opacity="0.6"/>
+            <polygon points="70,50 65,58 40,58 40,50" fill="#1A6B50" opacity="0.6"/>
+            <polygon points="65,58 40,98 40,58" fill="#2E9E76" opacity="0.6"/>
+          </svg>
+          <span class="mystery-qmark">?</span>
+          <span class="mystery-label">premium</span>
+        </div>
       </div>
+      <div class="box-price">$10<span class="box-price-unit">/yr</span></div>
+      <div class="box-desc">
+        4–6 character names<br>
+        60% random, 25% near-dict, 15% dictionary<br>
+        expected avg grade: 4.5–6.0
+      </div>
+      <div class="box-stats">
+        <div class="box-stat"><div class="box-stat-label">pool</div><div class="box-stat-value">5,000</div></div>
+        <div class="box-stat"><div class="box-stat-label">vs direct</div><div class="box-stat-value">94% off</div></div>
+        <div class="box-stat"><div class="box-stat-label">gem odds</div><div class="box-stat-value">~8%</div></div>
+        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5/yr</div></div>
+      </div>
+      <button class="box-cta">pull premium</button>
     </div>
-    <div class="card">
-      <object data="h4ck3r.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">h4ck3r.etc</span>
-        <span class="card-meta">Ultra Rare • Leetspeak</span>
+
+    <!-- Elite -->
+    <div class="mystery-box tier-elite">
+      <div class="box-tier">elite</div>
+      <div class="mystery-card-preview">
+        <div class="mystery-card-inner">
+          <svg class="mystery-diamond" viewBox="0 0 80 100">
+            <polygon points="40,2 70,50 40,98 10,50" fill="#0D3D2E"/>
+            <polygon points="40,2 15,42 40,42" fill="#4FD4A4"/>
+            <polygon points="15,42 10,50 40,50 40,42" fill="#3FB68B"/>
+            <polygon points="10,50 15,58 40,58 40,50" fill="#3FB68B"/>
+            <polygon points="15,58 40,98 40,58" fill="#4FD4A4"/>
+            <polygon points="40,2 65,42 40,42" fill="#1A6B50"/>
+            <polygon points="65,42 70,50 40,50 40,42" fill="#0D3D2E"/>
+            <polygon points="70,50 65,58 40,58 40,50" fill="#1A6B50"/>
+            <polygon points="65,58 40,98 40,58" fill="#2E9E76"/>
+          </svg>
+          <span class="mystery-qmark">?</span>
+          <span class="mystery-label">elite</span>
+        </div>
       </div>
-    </div>
-    <div class="card">
-      <object data="bob.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">bob.etc</span>
-        <span class="card-meta">Legendary • Pure Alpha</span>
+      <div class="box-price">$50<span class="box-price-unit">/yr</span></div>
+      <div class="box-desc">
+        3–5 character curated names<br>
+        40% alpha, 30% dictionary, 20% 3-char, 10% patterns<br>
+        expected avg grade: 6.0–8.0
       </div>
-    </div>
-    <div class="card">
-      <object data="0x42.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">0x42.etc</span>
-        <span class="card-meta">Epic • Alphanumeric</span>
+      <div class="box-stats">
+        <div class="box-stat"><div class="box-stat-label">pool</div><div class="box-stat-value">1,000</div></div>
+        <div class="box-stat"><div class="box-stat-label">vs direct</div><div class="box-stat-value">92% off</div></div>
+        <div class="box-stat"><div class="box-stat-label">gem odds</div><div class="box-stat-value">~20%</div></div>
+        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5/yr</div></div>
       </div>
-    </div>
-    <div class="card">
-      <object data="vitalik.svg" type="image/svg+xml"></object>
-      <div class="card-info">
-        <span class="card-name">vitalik.etc</span>
-        <span class="card-meta">Rare • Pure Alpha</span>
-      </div>
+      <button class="box-cta">pull elite</button>
     </div>
   </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: Bulk Purchase Pricing -->
+  <!-- ============================================================ -->
+
+  <h2>bulk pricing — pack economy</h2>
+  <p class="section-desc">
+    nobody buys one pack — they buy a box. bulk mystery pulls increase volume and reduce per-unit cost.<br>
+    "just one more box" psychology. commit-reveal batched in a single transaction.
+  </p>
+
+  <table class="bulk-table">
+    <thead>
+      <tr>
+        <th>purchase type</th>
+        <th>quantity</th>
+        <th>discount</th>
+        <th>standard</th>
+        <th>premium</th>
+        <th>elite</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>single</td><td>1</td><td>—</td>
+        <td>$2.00</td><td>$10.00</td><td>$50.00</td>
+      </tr>
+      <tr>
+        <td>pack</td><td>10</td><td class="discount">10%</td>
+        <td>$18.00</td><td>$90.00</td><td>$450.00</td>
+      </tr>
+      <tr>
+        <td>box</td><td>25</td><td class="discount">15%</td>
+        <td>$42.50</td><td>$212.50</td><td>$1,062.50</td>
+      </tr>
+      <tr>
+        <td>case</td><td>50</td><td class="discount">20%</td>
+        <td>$80.00</td><td>$400.00</td><td>$2,000.00</td>
+      </tr>
+      <tr>
+        <td>carton</td><td>100</td><td class="discount">25%</td>
+        <td>$150.00</td><td>$750.00</td><td>$3,750.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: Pack Opening Reveal Simulation -->
+  <!-- ============================================================ -->
+
+  <h2>pack opening — reveal simulation</h2>
+  <p class="section-desc">
+    click each card to flip and reveal. the grade badge shows immediately — hit or miss.<br>
+    this simulates a 10-pack premium pull. high-grade pulls (8.0+) glow on reveal.
+  </p>
+
+  <div class="reveal-grid" id="reveal-grid"></div>
+
+  <div class="footer">
+    ecns • ethereum classic name service • mordor testnet (chain 63) • all nft artwork is fully on-chain svg<br>
+    grade system: eg 1.0–10.0 • sub-grades: scarcity / composition / resonance / structure<br>
+    mystery box: commit-reveal randomness • provenance: "mystery pull" permanent trait
+  </div>
+
+  <script>
+    // ================================================================
+    // NFT Card Data — simulated grade results for gallery preview
+    // ================================================================
+    const nftCards = [
+      {
+        name: "aba", label: "aba", tier: "Legendary", charClass: "Pure Alpha",
+        fluency: "Euphonious", pattern: "Palindrome",
+        grade: "10.0", gradeClass: "grade-gem", provenance: "direct",
+        scarcity: 30, composition: 25, resonance: 25, structure: 15, raw: 95
+      },
+      {
+        name: "eth", label: "eth", tier: "Legendary", charClass: "Pure Alpha",
+        fluency: "Euphonious", pattern: "Standard",
+        grade: "9.5", gradeClass: "grade-gem", provenance: "direct",
+        scarcity: 30, composition: 25, resonance: 25, structure: 2, raw: 82
+      },
+      {
+        name: "alice", label: "alice", tier: "Rare", charClass: "Pure Alpha",
+        fluency: "Euphonious", pattern: "Standard",
+        grade: "8.5", gradeClass: "grade-high", provenance: "direct",
+        scarcity: 18, composition: 25, resonance: 25, structure: 2, raw: 70
+      },
+      {
+        name: "1337", label: "1337", tier: "Ultra Rare", charClass: "Leetspeak",
+        fluency: "Standard", pattern: "Standard",
+        grade: "7.5", gradeClass: "grade-high", provenance: "direct",
+        scarcity: 24, composition: 25, resonance: 10, structure: 2, raw: 61
+      },
+      {
+        name: "crypto", label: "crypto", tier: "Rare", charClass: "Pure Alpha",
+        fluency: "Fluent", pattern: "Standard",
+        grade: "7.5", gradeClass: "grade-high", provenance: "direct",
+        scarcity: 15, composition: 25, resonance: 18, structure: 2, raw: 60
+      },
+      {
+        name: "bob", label: "bob", tier: "Legendary", charClass: "Pure Alpha",
+        fluency: "Fluent", pattern: "Palindrome",
+        grade: "9.0", gradeClass: "grade-gem", provenance: "direct",
+        scarcity: 30, composition: 25, resonance: 18, structure: 15, raw: 88
+      },
+      {
+        name: "vitalik", label: "vitalik", tier: "Rare", charClass: "Pure Alpha",
+        fluency: "Fluent", pattern: "Standard",
+        grade: "5.5", gradeClass: "grade-mid", provenance: "direct",
+        scarcity: 12, composition: 20, resonance: 18, structure: 2, raw: 52
+      },
+      {
+        name: "xjqwz", label: "xjqwz", tier: "Rare", charClass: "Pure Alpha",
+        fluency: "Harsh", pattern: "Standard",
+        grade: "5.5", gradeClass: "grade-mid", provenance: "mystery",
+        scarcity: 18, composition: 20, resonance: 3, structure: 2, raw: 43
+      },
+      {
+        name: "k8m2x", label: "k8m2x", tier: "Rare", charClass: "Alphanumeric",
+        fluency: "Harsh", pattern: "Standard",
+        grade: "4.5", gradeClass: "grade-low", provenance: "mystery",
+        scarcity: 18, composition: 8, resonance: 3, structure: 2, raw: 31
+      },
+      {
+        name: "holographic", label: "holographic", tier: "Common", charClass: "Pure Alpha",
+        fluency: "Euphonious", pattern: "Standard",
+        grade: "6.5", gradeClass: "grade-mid", provenance: "direct",
+        scarcity: 3, composition: 20, resonance: 25, structure: 2, raw: 50
+      },
+      {
+        name: "0x42", label: "0x42", tier: "Epic", charClass: "Alphanumeric",
+        fluency: "Harsh", pattern: "Standard",
+        grade: "4.0", gradeClass: "grade-low", provenance: "direct",
+        scarcity: 24, composition: 8, resonance: 3, structure: 2, raw: 37
+      },
+      {
+        name: "abcde", label: "abcde", tier: "Rare", charClass: "Pure Alpha",
+        fluency: "Standard", pattern: "Sequential",
+        grade: "6.0", gradeClass: "grade-mid", provenance: "mystery",
+        scarcity: 18, composition: 20, resonance: 10, structure: 12, raw: 60
+      }
+    ];
+
+    // ================================================================
+    // Generate inline SVG card previews (simplified — no holographic filter)
+    // ================================================================
+    function generateCardSVG(card) {
+      // Deterministic colors from label
+      const hash = Array.from(card.label).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+      const bgPalette = ['0F1A15', '0D3D2E', '1A2A22', '132F25', '0B2E22'];
+      const circlePalette = ['4FD4A4', '3FB68B', '5EE0B2', '2E9E76', '1A6B50', '45BF96', '3DD4A0', '2CCFB2', '28A874', '1B9E85', '0FA87A', '189068'];
+      const bg = bgPalette[Math.abs(hash) % 5];
+      const c1 = circlePalette[Math.abs(hash >> 4) % 12];
+      const c2 = circlePalette[Math.abs(hash >> 8) % 12];
+      const c3 = circlePalette[Math.abs(hash >> 12) % 12];
+      const x1 = 80 + (Math.abs(hash >> 3) % 340);
+      const y1 = 80 + (Math.abs(hash >> 7) % 340);
+      const x2 = 80 + (Math.abs(hash >> 11) % 340);
+      const y2 = 80 + (Math.abs(hash >> 15) % 340);
+
+      const gradeBadgeColors = [
+        'rgba(94,224,178,0.85)', 'rgba(63,182,139,0.70)', 'rgba(46,158,118,0.55)',
+        'rgba(26,107,80,0.45)', 'rgba(13,61,46,0.40)'
+      ];
+      const gradeFloat = parseFloat(card.grade);
+      const colorIdx = gradeFloat >= 9.0 ? 0 : gradeFloat >= 7.0 ? 1 : gradeFloat >= 5.0 ? 2 : gradeFloat >= 3.0 ? 3 : 4;
+      const badgeFill = gradeBadgeColors[colorIdx];
+
+      const fontSize = card.label.length + 4 <= 7 ? 72 : card.label.length + 4 <= 8 ? 64 : card.label.length + 4 <= 10 ? 48 : card.label.length + 4 <= 13 ? 36 : 28;
+      const isRare = card.tier === 'Ultra Rare' || card.tier === 'Legendary' || card.tier === 'Epic';
+
+      return `<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="c-${card.label}"><rect width="500" height="500" rx="42" ry="42"/></clipPath>
+          <radialGradient id="v-${card.label}" cx="50%" cy="50%" r="60%">
+            <stop offset="50%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.35)"/>
+          </radialGradient>
+          <pattern id="scan-${card.label}" width="4" height="2" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="4" y2="0" stroke="#000" stroke-width="1" opacity=".06"/>
+          </pattern>
+        </defs>
+        <g clip-path="url(#c-${card.label})">
+          <rect width="500" height="500" fill="#${bg}"/>
+          <circle cx="${x1}" cy="${y1}" r="120" fill="#${c1}" opacity="0.4"/>
+          <circle cx="${x2}" cy="${y2}" r="120" fill="#${c2}" opacity="0.3"/>
+          <circle cx="${(x1+x2)/2}" cy="${(y1+y2)/2}" r="100" fill="#${c3}" opacity="0.25"/>
+          <rect width="500" height="500" fill="url(#scan-${card.label})"/>
+          <rect width="500" height="500" fill="url(#v-${card.label})"/>
+          <rect width="500" height="500" rx="42" ry="42" fill="none" stroke="rgba(63,182,139,0.20)"/>
+        </g>
+        <rect x="16" y="16" width="468" height="468" rx="26" ry="26" fill="none" stroke="rgba(63,182,139,0.12)"/>
+
+        <!-- Diamond mark -->
+        <g style="transform:translate(30px, 28px) scale(0.3)" opacity="0.7">
+          <polygon points="40,2 70,50 40,98 10,50" fill="#0D3D2E"/>
+          <polygon points="40,2 15,42 40,42" fill="#4FD4A4"/>
+          <polygon points="15,42 10,50 40,50 40,42" fill="#3FB68B"/>
+          <polygon points="10,50 15,58 40,58 40,50" fill="#3FB68B"/>
+          <polygon points="15,58 40,98 40,58" fill="#4FD4A4"/>
+          <polygon points="40,2 65,42 40,42" fill="#1A6B50"/>
+          <polygon points="65,42 70,50 40,50 40,42" fill="#0D3D2E"/>
+          <polygon points="70,50 65,58 40,58 40,50" fill="#1A6B50"/>
+          <polygon points="65,58 40,98 40,58" fill="#2E9E76"/>
+        </g>
+
+        <!-- Grade badge -->
+        <g style="transform:translate(390px, 28px)">
+          <rect width="80" height="52" rx="8" ry="8" fill="${badgeFill}"/>
+          <text x="40" y="34" text-anchor="middle" fill="#E8E8E8" font-family="'IBM Plex Mono', monospace" font-size="22" font-weight="bold">${card.grade}</text>
+          <text x="40" y="46" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="'IBM Plex Mono', monospace" font-size="7" letter-spacing="1.5">ecns graded</text>
+        </g>
+
+        <!-- Chain -->
+        <text x="460" y="90" text-anchor="end" fill="rgba(63,182,139,0.4)" font-family="'IBM Plex Mono', monospace" font-size="10">Mordor Testnet</text>
+
+        <!-- Name -->
+        <text y="230" x="250" text-anchor="middle" fill="white" font-family="'IBM Plex Mono', monospace" font-weight="200" font-size="${fontSize}">${card.name}.etc</text>
+        <text y="270" x="250" text-anchor="middle" fill="#3FB68B" opacity=".5" font-family="'IBM Plex Mono', monospace" font-size="12" font-weight="bold" letter-spacing="3">ecns</text>
+
+        <!-- Data badges -->
+        <g style="transform:translate(29px, 388px)">
+          <rect width="${7 * ('Tier: '.length + card.tier.length + 4)}" height="26" rx="8" ry="8" fill="rgba(13,61,46,0.7)"/>
+          <text x="12" y="17" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#E8E8E8"><tspan fill="rgba(79,212,164,0.6)">Tier: </tspan>${card.tier}</text>
+        </g>
+        <g style="transform:translate(29px, 416px)">
+          <rect width="${7 * ('Class: '.length + card.charClass.length + 4)}" height="26" rx="8" ry="8" fill="rgba(13,61,46,0.7)"/>
+          <text x="12" y="17" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#E8E8E8"><tspan fill="rgba(79,212,164,0.6)">Class: </tspan>${card.charClass}</text>
+        </g>
+        <g style="transform:translate(29px, 444px)">
+          <rect width="${7 * ('Fluency: '.length + card.fluency.length + 4)}" height="26" rx="8" ry="8" fill="rgba(13,61,46,0.7)"/>
+          <text x="12" y="17" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#E8E8E8"><tspan fill="rgba(79,212,164,0.6)">Fluency: </tspan>${card.fluency}</text>
+        </g>
+        ${card.pattern !== 'Standard' ? `<g style="transform:translate(29px, 466px)">
+          <rect width="${7 * ('Pattern: '.length + card.pattern.length + 4)}" height="26" rx="8" ry="8" fill="rgba(13,61,46,0.7)"/>
+          <text x="12" y="17" font-family="'IBM Plex Mono', monospace" font-size="12" fill="#E8E8E8"><tspan fill="rgba(79,212,164,0.6)">Pattern: </tspan>${card.pattern}</text>
+        </g>` : ''}
+
+        <!-- Expiry -->
+        <text x="470" y="478" text-anchor="end" fill="rgba(63,182,139,0.5)" font-family="'IBM Plex Mono', monospace" font-size="10">365d</text>
+
+        ${isRare ? `<!-- Sparkle -->
+        <g style="transform:translate(436px, 420px)">
+          <rect width="36" height="36" rx="8" ry="8" fill="none" stroke="rgba(63,182,139,0.3)"/>
+          <g>
+            <path style="transform:translate(6px,6px)" d="M12 0L12.6522 9.56587L18 1.6077L13.7819 10.2181L22.3923 6L14.4341 11.3478L24 12L14.4341 12.6522L22.3923 18L13.7819 13.7819L18 22.3923L12.6522 14.4341L12 24L11.3478 14.4341L6 22.3923L10.2181 13.7819L1.6077 18L9.56587 12.6522L0 12L9.56587 11.3478L1.6077 6L10.2181 10.2181L6 1.6077L11.3478 9.56587L12 0Z" fill="#4FD4A4"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="10s" repeatCount="indefinite"/>
+          </g>
+        </g>` : ''}
+      </svg>`;
+    }
+
+    // ================================================================
+    // Render NFT Grid
+    // ================================================================
+    const grid = document.getElementById('nft-grid');
+    nftCards.forEach(card => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        ${generateCardSVG(card)}
+        <div class="card-info">
+          <div>
+            <span class="card-name">${card.name}.etc</span>
+            <span class="card-grade ${card.gradeClass}">EG ${card.grade}</span>
+            <br><span class="provenance ${card.provenance === 'mystery' ? 'prov-mystery' : 'prov-direct'}">${card.provenance === 'mystery' ? 'mystery pull' : 'direct'}</span>
+          </div>
+          <div class="card-meta">
+            ${card.tier}<br>
+            S:${card.scarcity} C:${card.composition} R:${card.resonance} St:${card.structure}
+          </div>
+        </div>
+      `;
+      grid.appendChild(div);
+    });
+
+    // ================================================================
+    // Grade Distribution
+    // ================================================================
+    const gradeDistData = [
+      { label: '1.0', pct: 1 }, { label: '1.5', pct: 2 }, { label: '2.0', pct: 3 },
+      { label: '2.5', pct: 5 }, { label: '3.0', pct: 8 }, { label: '3.5', pct: 12 },
+      { label: '4.0', pct: 15 }, { label: '4.5', pct: 14 }, { label: '5.0', pct: 12 },
+      { label: '5.5', pct: 9 }, { label: '6.0', pct: 7 }, { label: '6.5', pct: 4 },
+      { label: '7.0', pct: 3 }, { label: '7.5', pct: 2 }, { label: '8.0', pct: 1.5 },
+      { label: '8.5', pct: 0.8 }, { label: '9.0', pct: 0.4 }, { label: '9.5', pct: 0.2 },
+      { label: '10.0', pct: 0.1 }
+    ];
+    const maxPct = Math.max(...gradeDistData.map(d => d.pct));
+    const distContainer = document.getElementById('grade-dist');
+    gradeDistData.forEach(d => {
+      const bar = document.createElement('div');
+      bar.className = 'grade-bar';
+      const h = (d.pct / maxPct) * 100;
+      bar.style.height = h + '%';
+      const g = parseFloat(d.label);
+      if (g >= 9.0) bar.style.background = 'rgba(94,224,178,0.85)';
+      else if (g >= 7.0) bar.style.background = 'rgba(63,182,139,0.70)';
+      else if (g >= 5.0) bar.style.background = 'rgba(46,158,118,0.55)';
+      else if (g >= 3.0) bar.style.background = 'rgba(26,107,80,0.45)';
+      else bar.style.background = 'rgba(13,61,46,0.40)';
+      bar.innerHTML = `<span class="grade-bar-count">${d.pct}%</span><span class="grade-bar-label">${d.label}</span>`;
+      distContainer.appendChild(bar);
+    });
+
+    // ================================================================
+    // Reveal Simulation — 10-pack premium pull
+    // ================================================================
+    const revealNames = [
+      { name: 'mako', grade: '7.0', tier: 1 },
+      { name: 'qvrx', grade: '3.5', tier: 3 },
+      { name: 'luna', grade: '8.0', tier: 1 },
+      { name: 'z9k4', grade: '3.0', tier: 3 },
+      { name: 'apex', grade: '7.5', tier: 1 },
+      { name: 'nxwp', grade: '4.0', tier: 3 },
+      { name: 'jazz', grade: '6.5', tier: 2 },
+      { name: 'bm7q', grade: '3.5', tier: 4 },
+      { name: 'echo', grade: '8.5', tier: 0 },
+      { name: 'rk2f', grade: '4.5', tier: 3 },
+    ];
+
+    const gradeBadgeColors = [
+      'rgba(94,224,178,0.85)', 'rgba(63,182,139,0.70)', 'rgba(46,158,118,0.55)',
+      'rgba(26,107,80,0.45)', 'rgba(13,61,46,0.40)'
+    ];
+
+    const revealGrid = document.getElementById('reveal-grid');
+    revealNames.forEach((n, i) => {
+      const card = document.createElement('div');
+      card.className = 'reveal-card';
+      card.innerHTML = `
+        <div class="reveal-card-inner">
+          <div class="reveal-front">
+            <span class="mystery-qmark">?</span>
+          </div>
+          <div class="reveal-back" style="background: linear-gradient(135deg, #0D3D2E, #132F25);">
+            <div class="reveal-name">${n.name}.etc</div>
+            <div class="reveal-grade" style="color: ${n.tier <= 1 ? '#5EE0B2' : '#E8E8E8'};">EG ${n.grade}</div>
+            <div style="margin-top: 4px; width: 32px; height: 18px; border-radius: 3px; background: ${gradeBadgeColors[n.tier]}; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 8px; font-weight: 700; color: ${n.tier <= 1 ? '#0a0a0a' : '#E8E8E8'};">${n.grade}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => card.classList.toggle('flipped'));
+      revealGrid.appendChild(card);
+    });
+  </script>
 </body>
 </html>
