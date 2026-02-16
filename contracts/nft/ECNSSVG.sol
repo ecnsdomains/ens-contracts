@@ -89,7 +89,7 @@ library ECNSSVG {
     ) private pure returns (string memory) {
         return Base64.encode(bytes(string(abi.encodePacked(
             "<svg width='500' height='500' viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>"
-            "<circle cx='", cx, "' cy='", cy, "' r='", r, "px' fill='#", color, "'/></svg>"
+            "<circle cx='", cx, "' cy='", cy, "' r='", r, "px' fill='#", color, "' opacity='0.6'/></svg>"
         ))));
     }
 
@@ -99,7 +99,7 @@ library ECNSSVG {
             '<feBlend mode="overlay" in="p0" in2="p1"/>'
             '<feBlend mode="soft-light" in2="p2"/>'
             '<feBlend mode="overlay" in2="p3" result="blendOut"/>'
-            '<feGaussianBlur in="blendOut" stdDeviation="42"/>'
+            '<feGaussianBlur in="blendOut" stdDeviation="28"/>'
             '</filter>'
             '<clipPath id="corners"><rect width="500" height="500" rx="42" ry="42"/></clipPath>'
             '<path id="text-path-a" d="M40 12 H460 A28 28 0 0 1 488 40 V460 A28 28 0 0 1 460 488 H40 A28 28 0 0 1 12 460 V40 A28 28 0 0 1 40 12 z"/>'

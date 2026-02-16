@@ -173,20 +173,20 @@ contract ECNSMetadataRenderer is IECNSMetadataRenderer, Ownable {
         return "0B2E22";               // Deep Forest
     }
 
-    /// @dev 12 green phosphor shades for gradient circles
+    /// @dev 12 dark-weighted green shades for gradient circles (8 dark + 4 accent)
     function _circlePalette(uint256 idx) internal pure returns (string memory) {
-        if (idx == 0) return "4FD4A4";  // Light Phosphor
-        if (idx == 1) return "3FB68B";  // Green Phosphor (Primary)
-        if (idx == 2) return "5EE0B2";  // Accent Hover
-        if (idx == 3) return "2E9E76";  // Mid Green
-        if (idx == 4) return "1A6B50";  // Deep Green
-        if (idx == 5) return "45BF96";  // Mint
-        if (idx == 6) return "3DD4A0";  // Neon Mint
-        if (idx == 7) return "2CCFB2";  // Teal
-        if (idx == 8) return "28A874";  // Classic Green
-        if (idx == 9) return "1B9E85";  // Cyan Green
-        if (idx == 10) return "0FA87A"; // Jade
-        return "189068";                // Emerald Dark
+        if (idx == 0) return "0D2E22";  // Abyssal Green   (L:15%)
+        if (idx == 1) return "0F3829";  // Void Emerald    (L:17%)
+        if (idx == 2) return "123D2D";  // Deep Mire       (L:19%)
+        if (idx == 3) return "15432F";  // Swamp Dark      (L:22%)
+        if (idx == 4) return "1A4E39";  // Peat Green      (L:25%)
+        if (idx == 5) return "1F5A42";  // Shadow Fern     (L:28%)
+        if (idx == 6) return "246548";  // Moss Depth      (L:30%)
+        if (idx == 7) return "2A7052";  // Dusk Jade       (L:33%)
+        if (idx == 8) return "2E9E76";  // Mid Green       (L:48%)
+        if (idx == 9) return "1A6B50";  // Deep Green      (L:38%)
+        if (idx == 10) return "3FB68B"; // Green Phosphor  (L:55%)
+        return "28A874";                // Classic Green    (L:48%)
     }
 
     // =========================================================================

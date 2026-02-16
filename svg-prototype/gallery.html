@@ -322,7 +322,7 @@
 </head>
 <body>
   <h1>ECNS NFT PREVIEW</h1>
-  <p class="subtitle">Phase 9 — ecns graded certification + mystery box • Mordor Testnet (Chain 63)</p>
+  <p class="subtitle">Phase 11 — dark palette rebalance + mystery box • Mordor Testnet (Chain 63)</p>
 
   <!-- ============================================================ -->
   <!-- SECTION 1: Graded NFT Cards -->
@@ -611,13 +611,13 @@
 
     // ================================================================
     // Generate inline SVG card previews — holographic feBlend filter chain
-    // Matches on-chain ECNSSVG.sol: feImage→feBlend overlay/soft-light→feGaussianBlur
+    // Matches on-chain ECNSSVG.sol: feImage→feBlend overlay/soft-light→feGaussianBlur(σ=28)
     // ================================================================
     function generateCardSVG(card) {
       // Deterministic colors from label (same hash as on-chain)
       const hash = Array.from(card.label).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
       const bgPalette = ['0F1A15', '0D3D2E', '1A2A22', '132F25', '0B2E22'];
-      const circlePalette = ['4FD4A4', '3FB68B', '5EE0B2', '2E9E76', '1A6B50', '45BF96', '3DD4A0', '2CCFB2', '28A874', '1B9E85', '0FA87A', '189068'];
+      const circlePalette = ['0D2E22', '0F3829', '123D2D', '15432F', '1A4E39', '1F5A42', '246548', '2A7052', '2E9E76', '1A6B50', '3FB68B', '28A874'];
       const glowPalette = ['45BF96', '3FB68B', '4FD4A4', '2E9E76', '5EE0B2', '2CCFB2'];
       const bg = bgPalette[Math.abs(hash) % 5];
       const c1 = circlePalette[Math.abs(hash >> 4) % 12];
@@ -635,9 +635,9 @@
       // Build base64-encoded inline SVGs for the feImage filter chain
       const svgWrap = (inner) => btoa(`<svg width='500' height='500' viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>${inner}</svg>`);
       const p0b64 = svgWrap(`<rect width='500' height='500' fill='#${bg}'/>`);
-      const p1b64 = svgWrap(`<circle cx='${x1}' cy='${y1}' r='120px' fill='#${c1}'/>`);
-      const p2b64 = svgWrap(`<circle cx='${x2}' cy='${y2}' r='120px' fill='#${c2}'/>`);
-      const p3b64 = svgWrap(`<circle cx='${x3}' cy='${y3}' r='100px' fill='#${c3}'/>`);
+      const p1b64 = svgWrap(`<circle cx='${x1}' cy='${y1}' r='120px' fill='#${c1}' opacity='0.6'/>`);
+      const p2b64 = svgWrap(`<circle cx='${x2}' cy='${y2}' r='120px' fill='#${c2}' opacity='0.6'/>`);
+      const p3b64 = svgWrap(`<circle cx='${x3}' cy='${y3}' r='100px' fill='#${c3}' opacity='0.6'/>`);
 
       // Texture patterns (matching on-chain ECNSSVG.sol)
       const textures = [
@@ -673,7 +673,7 @@
             <feBlend mode="overlay" in="p0" in2="p1"/>
             <feBlend mode="soft-light" in2="p2"/>
             <feBlend mode="overlay" in2="p3" result="blendOut"/>
-            <feGaussianBlur in="blendOut" stdDeviation="42"/>
+            <feGaussianBlur in="blendOut" stdDeviation="28"/>
           </filter>
           <clipPath id="c-${card.label}"><rect width="500" height="500" rx="42" ry="42"/></clipPath>
           <filter id="tb-${card.label}"><feGaussianBlur in="SourceGraphic" stdDeviation="24"/></filter>
