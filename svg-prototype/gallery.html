@@ -611,7 +611,7 @@
 
     // ================================================================
     // Generate inline SVG card previews — holographic feBlend filter chain
-    // Matches on-chain ECNSSVG.sol: feImage→feBlend overlay/exclusion→feGaussianBlur
+    // Matches on-chain ECNSSVG.sol: feImage→feBlend overlay/soft-light→feGaussianBlur
     // ================================================================
     function generateCardSVG(card) {
       // Deterministic colors from label (same hash as on-chain)
@@ -664,7 +664,7 @@
 
       return `<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
-          <!-- Holographic filter: feImage→feBlend overlay/exclusion→feGaussianBlur -->
+          <!-- Holographic filter: feImage→feBlend overlay/soft-light→feGaussianBlur -->
           <filter id="f-${card.label}">
             <feImage result="p0" xlink:href="data:image/svg+xml;base64,${p0b64}"/>
             <feImage result="p1" xlink:href="data:image/svg+xml;base64,${p1b64}"/>
