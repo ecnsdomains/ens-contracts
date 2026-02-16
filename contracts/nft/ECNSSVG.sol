@@ -97,7 +97,7 @@ library ECNSSVG {
         return string(abi.encodePacked(
             '"/>'
             '<feBlend mode="overlay" in="p0" in2="p1"/>'
-            '<feBlend mode="exclusion" in2="p2"/>'
+            '<feBlend mode="soft-light" in2="p2"/>'
             '<feBlend mode="overlay" in2="p3" result="blendOut"/>'
             '<feGaussianBlur in="blendOut" stdDeviation="42"/>'
             '</filter>'

@@ -671,7 +671,7 @@
             <feImage result="p2" xlink:href="data:image/svg+xml;base64,${p2b64}"/>
             <feImage result="p3" xlink:href="data:image/svg+xml;base64,${p3b64}"/>
             <feBlend mode="overlay" in="p0" in2="p1"/>
-            <feBlend mode="exclusion" in2="p2"/>
+            <feBlend mode="soft-light" in2="p2"/>
             <feBlend mode="overlay" in2="p3" result="blendOut"/>
             <feGaussianBlur in="blendOut" stdDeviation="42"/>
           </filter>
@@ -782,7 +782,7 @@
           </div>
           <div class="card-meta">
             ${card.tier}<br>
-            S:${card.scarcity} C:${card.composition} R:${card.resonance} St:${card.structure}
+            Scarcity:${card.scarcity} Comp:${card.composition} Res:${card.resonance} Struct:${card.structure}
           </div>
         </div>
       `;

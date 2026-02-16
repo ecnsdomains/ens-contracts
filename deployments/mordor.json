@@ -12,7 +12,7 @@
     "ExponentialPremiumPriceOracle": "0xf16140598170236cdbbc309b9357d5785c88c2e8",
     "ETCRegistrarController": "0x3daccff9a51a04ac01a09ba78919874536b34309",
     "PublicResolver": "0xa2d0c9a23729811607e09487cdd98dbb43e55f71",
-    "ECNSMetadataRenderer": "0x44cf5493176653d0eaf6345e5082e4aebad26307",
+    "ECNSMetadataRenderer": "0xe4ac8fe33dcdc805c0ec9eb50f5913ca0424af6b",
     "ECNSWordDictionary": "0xbbaf428472bbb7800c5bd255832a9858cead15fd"
   },
   "notDeployed": [

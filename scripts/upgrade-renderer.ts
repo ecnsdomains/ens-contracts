@@ -15,7 +15,7 @@ const mordor = {
   id: 63,
   name: 'Mordor',
   nativeCurrency: { name: 'Mordor Ether', symbol: 'METC', decimals: 18 },
-  rpcUrls: { default: { http: ['https://rpc.mordor.etccooperative.org'] } },
+  rpcUrls: { default: { http: ['http://localhost:8545'] } },
   testnet: true,
 } as const
 
@@ -31,6 +31,7 @@ async function main() {
   const deploymentsPath = path.join(__dirname, '../deployments/mordor.json')
   const deployments = JSON.parse(fs.readFileSync(deploymentsPath, 'utf8'))
   const baseRegistrar = deployments.contracts.BaseRegistrar as `0x${string}`
+  const dictionary = deployments.contracts.ECNSWordDictionary as `0x${string}`
 
   // Load artifacts
   const artifactsDir = path.join(__dirname, '../artifacts/contracts')
@@ -50,6 +51,7 @@ async function main() {
   const deployHash = await walletClient.deployContract({
     abi: rendererArtifact.abi,
     bytecode: rendererArtifact.bytecode as `0x${string}`,
+    args: [dictionary],
   })
   console.log('  Tx:', deployHash)
   const receipt = await publicClient.waitForTransactionReceipt({ hash: deployHash })
