@@ -8,15 +8,15 @@ ECNS lets you replace `0x3b09...1537` with `myname.etc`.
 
 | Contract | Address |
 |----------|---------|
-| ECNSRegistry | `0x29dd3a41973ec0551bcd195e46e8eb9801621c34` |
-| BaseRegistrar | `0xfbce90395535d6ae9448f55d676bde9a40215a37` |
-| ETCRegistrarController | `0x6d36c84926c2637448f2a7eabad3a0eed7f95b25` |
-| PublicResolver | `0xc1267bafafd08fe85580985b020b2df08d863ca4` |
-| ECNSMetadataRenderer | `0xb82b372b7a368a3f3c1ff9ba96128650f629194b` |
+| ECNSRegistry | `0x298195a795a5fe91bb47db1c4e501f07767775c8` |
+| BaseRegistrar | `0x828efe05d833bd3e10a3086cf2df1c49bad0082f` |
+| ETCRegistrarController | `0x3daccff9a51a04ac01a09ba78919874536b34309` |
+| PublicResolver | `0xa2d0c9a23729811607e09487cdd98dbb43e55f71` |
+| ReverseRegistrar | `0xab9ffcf5ccaaf0f276a7c9813d57a8418e7e9f6a` |
+| ECNSMetadataRenderer | `0x3b0d6f757cc53197ac8515b1e75088bcabdfea73` |
 | ECNSWordDictionary | `0xbbaf428472bbb7800c5bd255832a9858cead15fd` |
-| ETCswapFullOracle | `0x34bda98deb5862a7f387a60a1e3b01879eb5f3fe` |
-| ExponentialPremiumPriceOracle | `0xae4cdb10b803849766a2b695bca1a7df5a962b06` |
-| ReverseRegistrar | `0x0ebc22b513866796157a9fc9e86d23c3cddc28ab` |
+| ETCswapFullOracle | `0x430198d8f9a854e90210d3df98294453f3a9b875` |
+| ExponentialPremiumPriceOracle | `0xf16140598170236cdbbc309b9357d5785c88c2e8` |
 
 Full deployment details: [`deployments/mordor.json`](deployments/mordor.json)
 
@@ -24,7 +24,7 @@ Full deployment details: [`deployments/mordor.json`](deployments/mordor.json)
 
 - **TLD**: `.etc` instead of `.eth`
 - **Pricing Oracle**: ETCswap V2+V3 TWAP oracle (no Chainlink dependency)
-- **NFT Metadata**: On-chain SVG with holographic gradient cards, trait system (Tier, Character Class, Fluency, Pattern)
+- **NFT Metadata**: On-chain SVG with holographic gradient cards, ECNS Grade (EG) system, trait system (Tier, Character Class, Fluency, Pattern)
 - **Leetspeak Detection**: Dictionary-based verification with 3 decode strategies (Map A standard, Map A alternate, Map B calculator)
 - **Content Moderation**: On-chain word dictionary + 1,876 reserved offensive terms with leet variants
 - **Reserved Names**: Brand protection, trademark protection, premium auctions
@@ -134,7 +134,7 @@ source .env && export DEPLOYER_KEY && npx tsx scripts/reserve-names.ts
 
 ### Prototype
 
-Open `svg-prototype/v3-card.html` in a browser to preview NFT card designs with the trait system. Includes dictionary-based leetspeak detection mirroring the on-chain logic.
+Open `svg-prototype/gallery.html` in a browser to preview NFT card designs with the trait system, ECNS Grade badges, and holographic gradient rendering. Includes dictionary-based leetspeak detection mirroring the on-chain logic.
 
 ## Networks
 

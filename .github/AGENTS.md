@@ -69,11 +69,12 @@ source .env && export DEPLOYER_KEY && npx tsx scripts/reserve-names.ts
 | ETC Mainnet | 61 | https://etc.rivet.link | Phase 2 |
 | Mordor Testnet | 63 | https://rpc.mordor.etccooperative.org | Deployed |
 
-**Mordor Deployment (2026-02-06):**
-- ECNSRegistry: `0x29dd3a41973ec0551bcd195e46e8eb9801621c34`
-- ETCRegistrarController: `0x6d36c84926c2637448f2a7eabad3a0eed7f95b25`
-- PublicResolver: `0xc1267bafafd08fe85580985b020b2df08d863ca4`
-- ECNSMetadataRenderer: `0xb82b372b7a368a3f3c1ff9ba96128650f629194b`
+**Mordor Deployment (2026-02-08):**
+- ECNSRegistry: `0x298195a795a5fe91bb47db1c4e501f07767775c8`
+- BaseRegistrar: `0x828efe05d833bd3e10a3086cf2df1c49bad0082f`
+- ETCRegistrarController: `0x3daccff9a51a04ac01a09ba78919874536b34309`
+- PublicResolver: `0xa2d0c9a23729811607e09487cdd98dbb43e55f71`
+- ECNSMetadataRenderer: `0x3b0d6f757cc53197ac8515b1e75088bcabdfea73`
 
 See `deployments/mordor.json` for full list.
 
@@ -183,7 +184,7 @@ describe('ETCRegistrarController', () => {
       account: privateKeyToAccount(process.env.DEPLOYER_KEY!)
     })
 
-    controller = '0x6d36c84926c2637448f2a7eabad3a0eed7f95b25'
+    controller = '0x3daccff9a51a04ac01a09ba78919874536b34309'
   })
 
   it('should register a name', async () => {
