@@ -322,7 +322,7 @@
 </head>
 <body>
   <h1>ECNS NFT PREVIEW</h1>
-  <p class="subtitle">Phase 7 — ecns graded certification + mystery box • Mordor Testnet (Chain 63)</p>
+  <p class="subtitle">Phase 9 — ecns graded certification + mystery box • Mordor Testnet (Chain 63)</p>
 
   <!-- ============================================================ -->
   <!-- SECTION 1: Graded NFT Cards -->
@@ -426,7 +426,7 @@
         <div class="box-stat"><div class="box-stat-label">pool</div><div class="box-stat-value">5,000</div></div>
         <div class="box-stat"><div class="box-stat-label">vs direct</div><div class="box-stat-value">94% off</div></div>
         <div class="box-stat"><div class="box-stat-label">gem odds</div><div class="box-stat-value">~8%</div></div>
-        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5/yr</div></div>
+        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5–160/yr</div></div>
       </div>
       <button class="box-cta">pull premium</button>
     </div>
@@ -461,7 +461,7 @@
         <div class="box-stat"><div class="box-stat-label">pool</div><div class="box-stat-value">1,000</div></div>
         <div class="box-stat"><div class="box-stat-label">vs direct</div><div class="box-stat-value">92% off</div></div>
         <div class="box-stat"><div class="box-stat-label">gem odds</div><div class="box-stat-value">~20%</div></div>
-        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5/yr</div></div>
+        <div class="box-stat"><div class="box-stat-label">renews at</div><div class="box-stat-value">$5–640/yr</div></div>
       </div>
       <button class="box-cta">pull elite</button>
     </div>
@@ -610,13 +610,15 @@
     ];
 
     // ================================================================
-    // Generate inline SVG card previews (simplified — no holographic filter)
+    // Generate inline SVG card previews — holographic feBlend filter chain
+    // Matches on-chain ECNSSVG.sol: feImage→feBlend overlay/exclusion→feGaussianBlur
     // ================================================================
     function generateCardSVG(card) {
-      // Deterministic colors from label
+      // Deterministic colors from label (same hash as on-chain)
       const hash = Array.from(card.label).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
       const bgPalette = ['0F1A15', '0D3D2E', '1A2A22', '132F25', '0B2E22'];
       const circlePalette = ['4FD4A4', '3FB68B', '5EE0B2', '2E9E76', '1A6B50', '45BF96', '3DD4A0', '2CCFB2', '28A874', '1B9E85', '0FA87A', '189068'];
+      const glowPalette = ['45BF96', '3FB68B', '4FD4A4', '2E9E76', '5EE0B2', '2CCFB2'];
       const bg = bgPalette[Math.abs(hash) % 5];
       const c1 = circlePalette[Math.abs(hash >> 4) % 12];
       const c2 = circlePalette[Math.abs(hash >> 8) % 12];
@@ -625,6 +627,29 @@
       const y1 = 80 + (Math.abs(hash >> 7) % 340);
       const x2 = 80 + (Math.abs(hash >> 11) % 340);
       const y2 = 80 + (Math.abs(hash >> 15) % 340);
+      const x3 = Math.floor((x1 + x2) / 2);
+      const y3 = Math.floor((y1 + y2) / 2);
+      const glowColor = glowPalette[Math.abs(hash >> 16) % 6];
+      const textureIdx = Math.abs(hash >> 19) % 4;
+
+      // Build base64-encoded inline SVGs for the feImage filter chain
+      const svgWrap = (inner) => btoa(`<svg width='500' height='500' viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>${inner}</svg>`);
+      const p0b64 = svgWrap(`<rect width='500' height='500' fill='#${bg}'/>`);
+      const p1b64 = svgWrap(`<circle cx='${x1}' cy='${y1}' r='120px' fill='#${c1}'/>`);
+      const p2b64 = svgWrap(`<circle cx='${x2}' cy='${y2}' r='120px' fill='#${c2}'/>`);
+      const p3b64 = svgWrap(`<circle cx='${x3}' cy='${y3}' r='100px' fill='#${c3}'/>`);
+
+      // Texture patterns (matching on-chain ECNSSVG.sol)
+      const textures = [
+        // 0: CRT scanlines
+        `<pattern id="tex-${card.label}" width="4" height="2" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0,0,0,0.06)" stroke-width="1"/></pattern>`,
+        // 1: Dot grid
+        `<pattern id="tex-${card.label}" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.5" fill="#3FB68B" opacity=".05"/></pattern>`,
+        // 2: Diamond hatching
+        `<pattern id="tex-${card.label}" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M6 0L12 6L6 12L0 6Z" fill="none" stroke="#3FB68B" stroke-width="0.5" opacity=".04"/></pattern>`,
+        // 3: Horizontal fine lines
+        `<pattern id="tex-${card.label}" width="6" height="6" patternUnits="userSpaceOnUse"><line x1="0" y1="3" x2="6" y2="3" stroke="#3FB68B" stroke-width="0.5" opacity=".04"/></pattern>`
+      ];
 
       const gradeBadgeColors = [
         'rgba(94,224,178,0.85)', 'rgba(63,182,139,0.70)', 'rgba(46,158,118,0.55)',
@@ -637,24 +662,46 @@
       const fontSize = card.label.length + 4 <= 7 ? 72 : card.label.length + 4 <= 8 ? 64 : card.label.length + 4 <= 10 ? 48 : card.label.length + 4 <= 13 ? 36 : 28;
       const isRare = card.tier === 'Ultra Rare' || card.tier === 'Legendary' || card.tier === 'Epic';
 
-      return `<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+      return `<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
+          <!-- Holographic filter: feImage→feBlend overlay/exclusion→feGaussianBlur -->
+          <filter id="f-${card.label}">
+            <feImage result="p0" xlink:href="data:image/svg+xml;base64,${p0b64}"/>
+            <feImage result="p1" xlink:href="data:image/svg+xml;base64,${p1b64}"/>
+            <feImage result="p2" xlink:href="data:image/svg+xml;base64,${p2b64}"/>
+            <feImage result="p3" xlink:href="data:image/svg+xml;base64,${p3b64}"/>
+            <feBlend mode="overlay" in="p0" in2="p1"/>
+            <feBlend mode="exclusion" in2="p2"/>
+            <feBlend mode="overlay" in2="p3" result="blendOut"/>
+            <feGaussianBlur in="blendOut" stdDeviation="42"/>
+          </filter>
           <clipPath id="c-${card.label}"><rect width="500" height="500" rx="42" ry="42"/></clipPath>
+          <filter id="tb-${card.label}"><feGaussianBlur in="SourceGraphic" stdDeviation="24"/></filter>
           <radialGradient id="v-${card.label}" cx="50%" cy="50%" r="60%">
             <stop offset="50%" stop-color="transparent"/>
             <stop offset="100%" stop-color="rgba(0,0,0,0.35)"/>
           </radialGradient>
-          <pattern id="scan-${card.label}" width="4" height="2" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="0" x2="4" y2="0" stroke="#000" stroke-width="1" opacity=".06"/>
-          </pattern>
+          ${textures[textureIdx]}
         </defs>
+        <!-- Outer glow with pulse -->
+        <rect x="-4" y="-4" width="508" height="508" rx="46" ry="46" fill="none" stroke="#${glowColor}" stroke-width="2" opacity=".15">
+          <animate attributeName="opacity" values=".1;.25;.1" dur="3s" repeatCount="indefinite"/>
+        </rect>
         <g clip-path="url(#c-${card.label})">
+          <!-- Base fill -->
           <rect width="500" height="500" fill="#${bg}"/>
-          <circle cx="${x1}" cy="${y1}" r="120" fill="#${c1}" opacity="0.4"/>
-          <circle cx="${x2}" cy="${y2}" r="120" fill="#${c2}" opacity="0.3"/>
-          <circle cx="${(x1+x2)/2}" cy="${(y1+y2)/2}" r="100" fill="#${c3}" opacity="0.25"/>
-          <rect width="500" height="500" fill="url(#scan-${card.label})"/>
-          <rect width="500" height="500" fill="url(#v-${card.label})"/>
+          <!-- Holographic gradient via filter -->
+          <rect style="filter: url(#f-${card.label})" width="500" height="500"/>
+          <!-- Top blur for text contrast -->
+          <g style="filter:url(#tb-${card.label}); transform:scale(1.5); transform-origin:center top;">
+            <rect fill="none" width="500" height="500"/>
+            <ellipse cx="50%" cy="0px" rx="280px" ry="120px" fill="#000" opacity="0.85"/>
+          </g>
+          <!-- Texture overlay -->
+          <rect width="500" height="500" fill="url(#tex-${card.label})"/>
+          <!-- CRT vignette -->
+          <rect width="500" height="500" fill="url(#v-${card.label})" rx="42" ry="42"/>
+          <!-- Inner border -->
           <rect width="500" height="500" rx="42" ry="42" fill="none" stroke="rgba(63,182,139,0.20)"/>
         </g>
         <rect x="16" y="16" width="468" height="468" rx="26" ry="26" fill="none" stroke="rgba(63,182,139,0.12)"/>
