@@ -10,3 +10,28 @@ forge-cache
 out
 deployments/**/.pendingSafeTransactions
 deployments/localhost
+# Claude Code working directory (local only)
+.claude/
+CLAUDE.md
+
+# Internal development directory
+.local/
+
+SESSION_NOTES.md
+PLANNING.md
+SCRATCH.md
+*.scratch.*
+*.draft.*
+
+# Blockchain & crypto
+keystore/
+*.keystore
+wallet.json
+mnemonic.txt
+
+# IDE & OS
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+Thumbs.db
